@@ -1,0 +1,8 @@
+mode: MainLine
+branches:
+  main:
+    regex: ^main$
+    tag: ''
+  feature:
+    regex: ^feature?[/-]
+    tag: useBranchName
