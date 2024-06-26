@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - "preview/**"
+    paths-ignore:
+      - .github/dependabot.yml
+      - LICENSE
+      - README.md
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  versioning:
+    uses: f2calv/gha-workflows/.github/workflows/gha-release-versioning.yml@v1
+    with:
+      tag-prefix: ''
+      tag-and-release: false
+
+  chart:
+    uses: f2calv/gha-workflows/.github/workflows/helm-chart-package.yml@v1
+    permissions:
+      packages: write #for pushing helm artifact
+      contents: read #note: for private repos setting packages to write, will reset all other permissions to none (weird?)
+    needs: [versioning]
+    with:
+      registry: ghcr.io/${{ github.repository_owner }}
+      repository: cascommon
+      chart-repository-prefix: charts/
+      tag: ${{ needs.versioning.outputs.semVer }}
+      is-library-chart: true
+      push-chart: ${{ github.ref_name == github.event.repository.default_branch }}
+
+  release:
+    needs: [versioning, chart]
+    if: github.ref == 'refs/heads/main'
+    uses: f2calv/gha-workflows/.github/workflows/gha-release-versioning.yml@v1
+    permissions:
+      contents: write
+    with:
+      semVer: ${{ needs.versioning.outputs.semVer }}
+      tag-prefix: ''
