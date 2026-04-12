@@ -6,7 +6,7 @@ echo "-------------------"
 sudo apt-get update
 sudo apt-get upgrade -y
 
-dotnet --version
+#dotnet --version
 pre-commit autoupdate
 
 echo "Done"
