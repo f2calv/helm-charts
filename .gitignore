@@ -432,3 +432,4 @@ FodyWeavers.xsd
 *.tgz
 *.lock
 manifest*
+.copilot-tracking
