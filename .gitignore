@@ -432,4 +432,6 @@ FodyWeavers.xsd
 *.tgz
 *.lock
 manifest*
-.copilot-tracking
+
+# HVE / Copilot runtime artefacts
+.copilot-tracking/
