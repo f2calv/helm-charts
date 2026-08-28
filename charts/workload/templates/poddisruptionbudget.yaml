@@ -1,0 +1,40 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+{{- $kind := default "Deployment" .Values.kind -}}
+{{- $supportedKinds := list "Deployment" "DaemonSet" "StatefulSet" "ScaledObject" -}}
+{{- if not (has $kind $supportedKinds) -}}
+{{- fail (printf "podDisruptionBudget.enabled is not supported for workload kind %s; supported kinds are Deployment, DaemonSet, StatefulSet, and ScaledObject" $kind) -}}
+{{- end -}}
+{{- $replicas := int (toString .Values.replicaCount) -}}
+{{- if le $replicas 0 -}}
+{{- fail "podDisruptionBudget.enabled requires replicaCount to be greater than 0" -}}
+{{- end -}}
+{{- $minAvailable := .Values.podDisruptionBudget.minAvailable -}}
+{{- $maxUnavailable := .Values.podDisruptionBudget.maxUnavailable -}}
+{{- $hasMinAvailable := not (kindIs "invalid" $minAvailable) -}}
+{{- $hasMaxUnavailable := not (kindIs "invalid" $maxUnavailable) -}}
+{{- if and $hasMinAvailable $hasMaxUnavailable -}}
+{{- fail "podDisruptionBudget.minAvailable and podDisruptionBudget.maxUnavailable are mutually exclusive" -}}
+{{- end -}}
+{{- if not (or $hasMinAvailable $hasMaxUnavailable) -}}
+{{- fail "podDisruptionBudget requires exactly one of minAvailable or maxUnavailable when enabled" -}}
+{{- end }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "workload.fullname" . }}
+  namespace: {{ include "workload.namespace" $ }}
+  labels:
+    {{- include "workload.labels" . | nindent 4 }}
+spec:
+  {{- if $hasMinAvailable }}
+  minAvailable: {{ $minAvailable }}
+  {{- else }}
+  maxUnavailable: {{ $maxUnavailable }}
+  {{- end }}
+  {{- with .Values.podDisruptionBudget.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "workload.selectorLabels" . | nindent 6 }}
+{{- end }}

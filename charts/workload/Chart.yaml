@@ -1,6 +1,6 @@
 apiVersion: v2
 name: workload
-description: A generic Helm chart for deploying a single containerized workload as a Deployment, DaemonSet, StatefulSet, ScaledObject, ScaledJob, or CronJob.
+description: A universal Helm chart with sensible defaults for common Kubernetes workload kinds.
 type: application
-version: 1.0.1
-appVersion: "1.0.1"
+version: 1.0.2
+appVersion: "1.0.2"

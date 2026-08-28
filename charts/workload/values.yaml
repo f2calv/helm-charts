@@ -172,6 +172,33 @@ tolerations: []
 affinity: {}
 topologySpreadConstraints: []
 
+# PodDisruptionBudget support is limited to long-running workload kinds.
+podDisruptionBudget:
+  enabled: false
+  # @schema
+  # oneOf:
+  #   - type: integer
+  #     minimum: 0
+  #   - type: string
+  #     pattern: ^(?:100|[0-9]{1,2})%$
+  #   - type: "null"
+  # @schema
+  # Set to null when using maxUnavailable instead.
+  minAvailable: 1
+  # @schema
+  # oneOf:
+  #   - type: integer
+  #     minimum: 0
+  #   - type: string
+  #     pattern: ^(?:100|[0-9]{1,2})%$
+  #   - type: "null"
+  # @schema
+  maxUnavailable: null
+  # @schema
+  # enum: [IfHealthyBudget, AlwaysAllow, ""]
+  # @schema
+  unhealthyPodEvictionPolicy: ""
+
 # @schema
 # type: [object, "null"]
 # additionalProperties:
