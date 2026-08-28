@@ -1,654 +1,654 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema#",
-  "title": "Workload chart values",
-  "type": "object",
-  "required": [
-    "image"
-  ],
-  "properties": {
-    "replicaCount": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "Deployment",
-        "DaemonSet",
-        "StatefulSet",
-        "ScaledObject",
-        "ScaledJob",
-        "CronJob"
-      ]
-    },
-    "namespaceOverride": {
-      "type": "string"
-    },
-    "serviceName": {
-      "type": "string"
-    },
-    "revisionHistoryLimit": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "strategy": {
-      "type": "object"
-    },
-    "updateStrategy": {
-      "type": "object"
-    },
-    "volumeClaimTemplates": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "cronJobSchedule": {
-      "type": "string"
-    },
-    "cronJobConcurrencyPolicy": {
-      "type": "string",
-      "enum": [
-        "Allow",
-        "Forbid",
-        "Replace"
-      ]
-    },
-    "restartPolicy": {
-      "type": "string",
-      "enum": [
-        "",
-        "Always",
-        "OnFailure",
-        "Never"
-      ]
-    },
-    "runtimeClassName": {
-      "type": "string"
-    },
-    "hostNetwork": {
-      "type": "boolean"
-    },
-    "dnsPolicy": {
-      "type": "string"
-    },
-    "terminationGracePeriodSeconds": {
-      "type": [
-        "integer",
-        "null"
-      ],
-      "minimum": 0
-    },
-    "image": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "repository",
-        "pullPolicy"
-      ],
-      "properties": {
-        "repository": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^\\S+$"
-        },
-        "pullPolicy": {
-          "type": "string",
-          "enum": [
-            "Always",
-            "Never",
-            "IfNotPresent"
-          ]
-        },
-        "tag": {
-          "type": "string"
-        }
-      }
-    },
-    "imagePullSecrets": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "command": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "args": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "nameOverride": {
-      "type": "string"
-    },
-    "fullnameOverride": {
-      "type": "string"
-    },
-    "serviceAccount": {
-      "type": "object",
-      "properties": {
-        "create": {
-          "type": "boolean"
-        },
-        "automount": {
-          "type": "boolean"
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "podAnnotations": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "podLabels": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "podSecurityContext": {
-      "type": "object"
-    },
-    "securityContext": {
-      "type": "object"
-    },
-    "service": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "ClusterIP",
-            "NodePort",
-            "LoadBalancer"
-          ]
-        },
-        "port": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535
-        },
-        "containerPort": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535
-        },
-        "protocol": {
-          "type": "string",
-          "enum": [
-            "TCP",
-            "UDP",
-            "SCTP"
-          ]
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "extraPorts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "name",
-          "port",
-          "containerPort"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "port": {
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Workload chart values",
+    "type": "object",
+    "required": [
+        "image"
+    ],
+    "properties": {
+        "replicaCount": {
             "type": "integer",
-            "minimum": 1,
-            "maximum": 65535
-          },
-          "containerPort": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 65535
-          },
-          "protocol": {
+            "minimum": 0
+        },
+        "kind": {
             "type": "string",
             "enum": [
-              "TCP",
-              "UDP",
-              "SCTP"
+                "Deployment",
+                "DaemonSet",
+                "StatefulSet",
+                "ScaledObject",
+                "ScaledJob",
+                "CronJob"
             ]
-          }
-        }
-      }
-    },
-    "ingress": {
-      "$ref": "#/definitions/ingress"
-    },
-    "extraIngresses": {
-      "type": "array",
-      "items": {
-        "allOf": [
-          {
-            "$ref": "#/definitions/ingress"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "nameSuffix": {
-                "type": "string",
-                "minLength": 1
-              }
-            }
-          }
-        ]
-      }
-    },
-    "resources": {
-      "type": "object"
-    },
-    "startupProbe": {
-      "$ref": "#/definitions/probe"
-    },
-    "readinessProbe": {
-      "$ref": "#/definitions/probe"
-    },
-    "livenessProbe": {
-      "$ref": "#/definitions/probe"
-    },
-    "lifecycle": {
-      "type": "object"
-    },
-    "autoscaling": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        }
-      }
-    },
-    "initContainers": {
-      "$ref": "#/definitions/objectArray"
-    },
-    "extraContainers": {
-      "$ref": "#/definitions/objectArray"
-    },
-    "volumes": {
-      "$ref": "#/definitions/objectArray"
-    },
-    "volumeMounts": {
-      "$ref": "#/definitions/objectArray"
-    },
-    "persistentVolumeClaims": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "name",
-          "accessModes",
-          "storage"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "storageClassName": {
+        },
+        "namespaceOverride": {
             "type": "string"
-          },
-          "accessModes": {
+        },
+        "serviceName": {
+            "type": "string"
+        },
+        "revisionHistoryLimit": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "strategy": {
+            "type": "object"
+        },
+        "updateStrategy": {
+            "type": "object"
+        },
+        "volumeClaimTemplates": {
             "type": "array",
             "items": {
-              "type": "string"
-            },
-            "minItems": 1
-          },
-          "storage": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      }
-    },
-    "configMaps": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "name",
-          "data"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "data": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
+                "type": "object"
             }
-          }
-        }
-      }
-    },
-    "nodeSelector": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "tolerations": {
-      "$ref": "#/definitions/objectArray"
-    },
-    "affinity": {
-      "type": "object"
-    },
-    "topologySpreadConstraints": {
-      "$ref": "#/definitions/objectArray"
-    },
-    "envFieldRef": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "envVars": {
-      "type": "object",
-      "additionalProperties": {
-        "type": [
-          "string",
-          "number",
-          "boolean"
-        ]
-      }
-    },
-    "envSecrets": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "envVarsFrom": {
-      "type": "object"
-    },
-    "job": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
         },
-        "nameSuffix": {
-          "type": "string",
-          "minLength": 1
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
+        "cronJobSchedule": {
             "type": "string"
-          }
         },
-        "command": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "args": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "env": {
-          "type": "object",
-          "additionalProperties": {
-            "type": [
-              "string",
-              "number",
-              "boolean"
+        "cronJobConcurrencyPolicy": {
+            "type": "string",
+            "enum": [
+                "Allow",
+                "Forbid",
+                "Replace"
             ]
-          }
-        },
-        "resources": {
-          "type": "object"
         },
         "restartPolicy": {
-          "type": "string",
-          "enum": [
-            "OnFailure",
-            "Never"
-          ]
+            "type": "string",
+            "enum": [
+                "",
+                "Always",
+                "OnFailure",
+                "Never"
+            ]
         },
-        "ttlSecondsAfterFinished": {
-          "type": "integer",
-          "minimum": 0
+        "runtimeClassName": {
+            "type": "string"
         },
-        "backoffLimit": {
-          "type": "integer",
-          "minimum": 0
-        }
-      }
-    },
-    "keda": {
-      "type": "object",
-      "properties": {
-        "pollingInterval": {
-          "type": "integer",
-          "minimum": 1
+        "hostNetwork": {
+            "type": "boolean"
         },
-        "cooldownPeriod": {
-          "type": "integer",
-          "minimum": 0
+        "dnsPolicy": {
+            "type": "string"
         },
-        "minReplicaCount": {
-          "type": "integer",
-          "minimum": 0
+        "terminationGracePeriodSeconds": {
+            "type": [
+                "integer",
+                "null"
+            ],
+            "minimum": 0
         },
-        "maxReplicaCount": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "databaseIndex": {
-          "type": [
-            "string",
-            "integer"
-          ]
-        },
-        "successfulJobsHistoryLimit": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "failedJobsHistoryLimit": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "rolloutStrategy": {
-          "type": "string",
-          "enum": [
-            "default",
-            "gradual"
-          ]
-        },
-        "jobTargetRef": {
-          "type": "object",
-          "properties": {
-            "activeDeadlineSeconds": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "backoffLimit": {
-              "type": "integer",
-              "minimum": 0
-            }
-          }
-        },
-        "triggers": {
-          "type": "array",
-          "items": {
+        "image": {
             "type": "object",
+            "additionalProperties": false,
             "required": [
-              "type",
-              "metadata"
+                "repository",
+                "pullPolicy"
             ],
             "properties": {
-              "type": {
-                "type": "string",
-                "minLength": 1
-              },
-              "metadata": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "authenticationRef": {
-                "type": "object",
-                "properties": {
-                  "name": {
+                "repository": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^\\S+$"
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "enum": [
+                        "Always",
+                        "Never",
+                        "IfNotPresent"
+                    ]
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "imagePullSecrets": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        },
+        "command": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "args": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "nameOverride": {
+            "type": "string"
+        },
+        "fullnameOverride": {
+            "type": "string"
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "automount": {
+                    "type": "boolean"
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "podAnnotations": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "podLabels": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "podSecurityContext": {
+            "type": "object"
+        },
+        "securityContext": {
+            "type": "object"
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "name": {
                     "type": "string",
                     "minLength": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "triggerAuthentications": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "name",
-              "spec"
-            ],
-            "properties": {
-              "name": {
-                "type": "string",
-                "minLength": 1
-              },
-              "spec": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "objectArray": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    },
-    "probe": {
-      "oneOf": [
-        {
-          "type": "object"
-        },
-        {
-          "const": false
-        }
-      ]
-    },
-    "ingress": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "className": {
-          "type": "string"
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "servicePort": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 65535
-            },
-            {
-              "const": ""
-            }
-          ]
-        },
-        "hosts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "host",
-              "paths"
-            ],
-            "properties": {
-              "host": {
-                "type": "string"
-              },
-              "paths": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "path"
-                  ],
-                  "properties": {
-                    "path": {
-                      "type": "string"
-                    },
-                    "pathType": {
-                      "type": "string",
-                      "enum": [
-                        "Exact",
-                        "Prefix",
-                        "ImplementationSpecific"
-                      ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "ClusterIP",
+                        "NodePort",
+                        "LoadBalancer"
+                    ]
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 65535
+                },
+                "containerPort": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 65535
+                },
+                "protocol": {
+                    "type": "string",
+                    "enum": [
+                        "TCP",
+                        "UDP",
+                        "SCTP"
+                    ]
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
                     }
-                  }
                 }
-              }
             }
-          }
         },
-        "tls": {
-          "type": "array",
-          "items": {
+        "extraPorts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "port",
+                    "containerPort"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "port": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535
+                    },
+                    "containerPort": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535
+                    },
+                    "protocol": {
+                        "type": "string",
+                        "enum": [
+                            "TCP",
+                            "UDP",
+                            "SCTP"
+                        ]
+                    }
+                }
+            }
+        },
+        "ingress": {
+            "$ref": "#/definitions/ingress"
+        },
+        "extraIngresses": {
+            "type": "array",
+            "items": {
+                "allOf": [
+                    {
+                        "$ref": "#/definitions/ingress"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "nameSuffix": {
+                                "type": "string",
+                                "minLength": 1
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "resources": {
             "type": "object"
-          }
+        },
+        "startupProbe": {
+            "$ref": "#/definitions/probe"
+        },
+        "readinessProbe": {
+            "$ref": "#/definitions/probe"
+        },
+        "livenessProbe": {
+            "$ref": "#/definitions/probe"
+        },
+        "lifecycle": {
+            "type": "object"
+        },
+        "autoscaling": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "initContainers": {
+            "$ref": "#/definitions/objectArray"
+        },
+        "extraContainers": {
+            "$ref": "#/definitions/objectArray"
+        },
+        "volumes": {
+            "$ref": "#/definitions/objectArray"
+        },
+        "volumeMounts": {
+            "$ref": "#/definitions/objectArray"
+        },
+        "persistentVolumeClaims": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "accessModes",
+                    "storage"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "storageClassName": {
+                        "type": "string"
+                    },
+                    "accessModes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 1
+                    },
+                    "storage": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            }
+        },
+        "configMaps": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "data"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "data": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "nodeSelector": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "tolerations": {
+            "$ref": "#/definitions/objectArray"
+        },
+        "affinity": {
+            "type": "object"
+        },
+        "topologySpreadConstraints": {
+            "$ref": "#/definitions/objectArray"
+        },
+        "envFieldRef": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "envVars": {
+            "type": "object",
+            "additionalProperties": {
+                "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                ]
+            }
+        },
+        "envSecrets": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "envVarsFrom": {
+            "type": "object"
+        },
+        "job": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "nameSuffix": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "command": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "args": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "env": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                        ]
+                    }
+                },
+                "resources": {
+                    "type": "object"
+                },
+                "restartPolicy": {
+                    "type": "string",
+                    "enum": [
+                        "OnFailure",
+                        "Never"
+                    ]
+                },
+                "ttlSecondsAfterFinished": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "backoffLimit": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "keda": {
+            "type": "object",
+            "properties": {
+                "pollingInterval": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "cooldownPeriod": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "minReplicaCount": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "maxReplicaCount": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "databaseIndex": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                },
+                "successfulJobsHistoryLimit": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "failedJobsHistoryLimit": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "rolloutStrategy": {
+                    "type": "string",
+                    "enum": [
+                        "default",
+                        "gradual"
+                    ]
+                },
+                "jobTargetRef": {
+                    "type": "object",
+                    "properties": {
+                        "activeDeadlineSeconds": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "backoffLimit": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                },
+                "triggers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "metadata"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "metadata": {
+                                "type": "object",
+                                "additionalProperties": true
+                            },
+                            "authenticationRef": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "minLength": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "triggerAuthentications": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "name",
+                            "spec"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "spec": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
         }
-      }
+    },
+    "definitions": {
+        "objectArray": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        },
+        "probe": {
+            "oneOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "const": false
+                }
+            ]
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "className": {
+                    "type": "string"
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "servicePort": {
+                    "oneOf": [
+                        {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                        },
+                        {
+                            "const": ""
+                        }
+                    ]
+                },
+                "hosts": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "host",
+                            "paths"
+                        ],
+                        "properties": {
+                            "host": {
+                                "type": "string"
+                            },
+                            "paths": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "path"
+                                    ],
+                                    "properties": {
+                                        "path": {
+                                            "type": "string"
+                                        },
+                                        "pathType": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Exact",
+                                                "Prefix",
+                                                "ImplementationSpecific"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tls": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
     }
-  }
 }
