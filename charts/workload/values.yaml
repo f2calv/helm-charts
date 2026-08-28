@@ -192,8 +192,13 @@ envVars: {}
 # @schema
 envSecrets: {}
 
+# @schema
+# type: array
+# items:
+#   type: object
+# @schema
 # Sources passed directly to the container envFrom list.
-envVarsFrom: {}
+envVarsFrom: []
 
 # Optional one-shot batch Job that uses the same image and shared pod settings.
 job:
