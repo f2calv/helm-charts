@@ -1,0 +1,66 @@
+name: _publish-chart
+
+on:
+  workflow_call:
+    inputs:
+      chart:
+        description: Chart directory name under charts/.
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.chart-version.outputs.result }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: read chart version (${{ inputs.chart }})
+        id: chart-version
+        shell: bash
+        env:
+          CHART_PATH: charts/${{ inputs.chart }}/Chart.yaml
+        run: |
+          VERSION=$(yq -r '.version' "$CHART_PATH")
+          if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+            echo "::error file=$CHART_PATH::Chart version is required."
+            exit 1
+          fi
+          echo "result=$VERSION" >> "$GITHUB_OUTPUT"
+
+  versioning:
+    needs: [metadata]
+    permissions:
+      contents: write
+    uses: f2calv/gha-workflows/.github/workflows/gha-release-versioning.yml@v1
+    with:
+      semVer: ${{ needs.metadata.outputs.version }}
+      tag-prefix: ${{ inputs.chart }}/
+      move-major-tag: false
+      tag-and-release: true
+    secrets: inherit
+
+  chart:
+    needs: [metadata, versioning]
+    if: needs.versioning.outputs['release-exists'] == 'false'
+    permissions:
+      contents: read
+      packages: write
+    uses: f2calv/gha-workflows/.github/workflows/helm-chart-package.yml@v1
+    with:
+      tag: ${{ needs.metadata.outputs.version }}
+      image-registry: ghcr.io
+      image-repository: ${{ github.repository_owner }}/charts/${{ inputs.chart }}
+      chart-registry: ghcr.io
+      chart-registry-username: ${{ github.repository_owner }}
+      chart-repository: ${{ github.repository_owner }}/charts/${{ inputs.chart }}
+      chart-path: charts/${{ inputs.chart }}
+      is-library-chart: true
+      push-chart: ${{ github.ref_name == github.event.repository.default_branch }}
+      chart-testing-cli-command: skip
+    secrets: inherit

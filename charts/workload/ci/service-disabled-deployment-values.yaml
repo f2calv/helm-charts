@@ -1,0 +1,11 @@
+replicaCount: 1
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+command:
+  - sh
+  - -c
+args:
+  - sleep 3600
+service:
+  enabled: false

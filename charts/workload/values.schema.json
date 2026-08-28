@@ -1,0 +1,719 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": true,
+  "properties": {
+    "affinity": {
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "args": {
+      "items": {
+        "required": []
+      },
+      "title": "args",
+      "type": "array"
+    },
+    "autoscaling": {
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "title": "autoscaling",
+      "type": "object"
+    },
+    "command": {
+      "description": "Override the container entrypoint command and arguments.",
+      "items": {
+        "required": []
+      },
+      "title": "command",
+      "type": "array"
+    },
+    "configMaps": {
+      "items": {
+        "required": []
+      },
+      "title": "configMaps",
+      "type": "array"
+    },
+    "cronJobConcurrencyPolicy": {
+      "default": "Replace",
+      "title": "cronJobConcurrencyPolicy",
+      "type": "string"
+    },
+    "cronJobSchedule": {
+      "default": "",
+      "description": "CronJob settings.",
+      "title": "cronJobSchedule",
+      "type": "string"
+    },
+    "dnsPolicy": {
+      "default": "",
+      "title": "dnsPolicy",
+      "type": "string"
+    },
+    "envFieldRef": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Downward API environment variables. Use null to clear inherited entries.",
+      "required": [],
+      "title": "envFieldRef",
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "envSecrets": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "required": [],
+      "title": "envSecrets"
+    },
+    "envVars": {
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean"
+        ]
+      },
+      "required": [],
+      "title": "envVars"
+    },
+    "envVarsFrom": {
+      "description": "Sources passed directly to the container envFrom list.",
+      "required": [],
+      "title": "envVarsFrom",
+      "type": "object"
+    },
+    "extraContainers": {
+      "items": {
+        "required": []
+      },
+      "title": "extraContainers",
+      "type": "array"
+    },
+    "extraIngresses": {
+      "description": "Additional Ingress resources targeting this workload's Service.",
+      "items": {
+        "required": []
+      },
+      "title": "extraIngresses",
+      "type": "array"
+    },
+    "extraPorts": {
+      "description": "Additional container and Service ports beyond the primary port.",
+      "items": {
+        "required": []
+      },
+      "title": "extraPorts",
+      "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "hostNetwork": {
+      "default": false,
+      "title": "hostNetwork",
+      "type": "boolean"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": [
+            "Always",
+            "Never",
+            "IfNotPresent"
+          ],
+          "required": [],
+          "title": "pullPolicy"
+        },
+        "repository": {
+          "default": "busybox",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "required": [],
+          "title": "repository"
+        },
+        "tag": {
+          "default": "",
+          "description": "Overrides the image tag whose default is the chart appVersion.",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "pullPolicy"
+      ],
+      "title": "image"
+    },
+    "imagePullSecrets": {
+      "items": {
+        "required": []
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "className": {
+          "default": "",
+          "title": "className",
+          "type": "string"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hosts": {
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "host": {
+                    "default": "example.local",
+                    "title": "host",
+                    "type": "string"
+                  },
+                  "paths": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "path": {
+                              "default": "/",
+                              "title": "path",
+                              "type": "string"
+                            },
+                            "pathType": {
+                              "default": "ImplementationSpecific",
+                              "title": "pathType",
+                              "type": "string"
+                            }
+                          },
+                          "required": [],
+                          "type": "object"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "paths",
+                    "type": "array"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "hosts",
+          "type": "array"
+        },
+        "servicePort": {
+          "default": "",
+          "description": "Override the Service port targeted by the ingress backend.",
+          "oneOf": [
+            {
+              "maximum": 65535,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "const": "",
+              "required": []
+            }
+          ],
+          "required": [],
+          "title": "servicePort"
+        },
+        "tls": {
+          "items": {
+            "required": []
+          },
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "ingress",
+      "type": "object"
+    },
+    "initContainers": {
+      "items": {
+        "required": []
+      },
+      "title": "initContainers",
+      "type": "array"
+    },
+    "job": {
+      "description": "Optional one-shot batch Job that uses the same image and shared pod settings.",
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "args": {
+          "items": {
+            "required": []
+          },
+          "title": "args",
+          "type": "array"
+        },
+        "backoffLimit": {
+          "default": "1",
+          "minimum": 0,
+          "required": [],
+          "title": "backoffLimit"
+        },
+        "command": {
+          "items": {
+            "required": []
+          },
+          "title": "command",
+          "type": "array"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "env": {
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "required": [],
+          "title": "env"
+        },
+        "nameSuffix": {
+          "default": "job",
+          "title": "nameSuffix",
+          "type": "string"
+        },
+        "resources": {
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "restartPolicy": {
+          "default": "Never",
+          "title": "restartPolicy",
+          "type": "string"
+        },
+        "ttlSecondsAfterFinished": {
+          "default": "360",
+          "minimum": 0,
+          "required": [],
+          "title": "ttlSecondsAfterFinished"
+        }
+      },
+      "required": [],
+      "title": "job",
+      "type": "object"
+    },
+    "keda": {
+      "description": "KEDA settings used by ScaledObject and ScaledJob workloads.",
+      "properties": {
+        "cooldownPeriod": {
+          "default": "300",
+          "minimum": 0,
+          "required": [],
+          "title": "cooldownPeriod"
+        },
+        "databaseIndex": {
+          "default": "",
+          "required": [],
+          "title": "databaseIndex",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "failedJobsHistoryLimit": {
+          "default": "5",
+          "minimum": 0,
+          "required": [],
+          "title": "failedJobsHistoryLimit"
+        },
+        "jobTargetRef": {
+          "properties": {
+            "activeDeadlineSeconds": {
+              "default": "600",
+              "minimum": 1,
+              "required": [],
+              "title": "activeDeadlineSeconds"
+            },
+            "backoffLimit": {
+              "default": "6",
+              "minimum": 0,
+              "required": [],
+              "title": "backoffLimit"
+            }
+          },
+          "required": [],
+          "title": "jobTargetRef",
+          "type": "object"
+        },
+        "maxReplicaCount": {
+          "default": "2",
+          "minimum": 0,
+          "required": [],
+          "title": "maxReplicaCount"
+        },
+        "minReplicaCount": {
+          "default": "1",
+          "minimum": 0,
+          "required": [],
+          "title": "minReplicaCount"
+        },
+        "pollingInterval": {
+          "default": "10",
+          "minimum": 1,
+          "required": [],
+          "title": "pollingInterval"
+        },
+        "rolloutStrategy": {
+          "default": "gradual",
+          "enum": [
+            "default",
+            "gradual"
+          ],
+          "required": [],
+          "title": "rolloutStrategy"
+        },
+        "successfulJobsHistoryLimit": {
+          "default": "5",
+          "minimum": 0,
+          "required": [],
+          "title": "successfulJobsHistoryLimit"
+        },
+        "triggerAuthentications": {
+          "items": {
+            "required": []
+          },
+          "title": "triggerAuthentications",
+          "type": "array"
+        },
+        "triggers": {
+          "description": "Trigger metadata remains open because its shape is scaler-specific.",
+          "items": {
+            "required": []
+          },
+          "title": "triggers",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "keda",
+      "type": "object"
+    },
+    "kind": {
+      "default": "Deployment",
+      "description": "Workload kind that determines the primary resource rendered.",
+      "enum": [
+        "Deployment",
+        "DaemonSet",
+        "StatefulSet",
+        "ScaledObject",
+        "ScaledJob",
+        "CronJob"
+      ],
+      "required": [],
+      "title": "kind"
+    },
+    "lifecycle": {
+      "required": [],
+      "title": "lifecycle",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "default": "false",
+      "oneOf": [
+        {
+          "required": [],
+          "type": "object"
+        },
+        {
+          "const": false,
+          "required": []
+        }
+      ],
+      "required": [],
+      "title": "livenessProbe"
+    },
+    "nameOverride": {
+      "default": "",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "namespaceOverride": {
+      "default": "",
+      "description": "Optional namespace override for resources rendered by this chart.",
+      "title": "namespaceOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "persistentVolumeClaims": {
+      "items": {
+        "required": []
+      },
+      "title": "persistentVolumeClaims",
+      "type": "array"
+    },
+    "podAnnotations": {
+      "required": [],
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "podLabels": {
+      "required": [],
+      "title": "podLabels",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "default": "false",
+      "oneOf": [
+        {
+          "required": [],
+          "type": "object"
+        },
+        {
+          "const": false,
+          "required": []
+        }
+      ],
+      "required": [],
+      "title": "readinessProbe"
+    },
+    "replicaCount": {
+      "default": "0",
+      "minimum": 0,
+      "required": [],
+      "title": "replicaCount"
+    },
+    "resources": {
+      "required": [],
+      "title": "resources",
+      "type": "object"
+    },
+    "restartPolicy": {
+      "default": "",
+      "description": "Pod execution settings. Leave empty for a kind-specific default.",
+      "title": "restartPolicy",
+      "type": "string"
+    },
+    "revisionHistoryLimit": {
+      "default": "3",
+      "minimum": 0,
+      "required": [],
+      "title": "revisionHistoryLimit"
+    },
+    "runtimeClassName": {
+      "default": "",
+      "title": "runtimeClassName",
+      "type": "string"
+    },
+    "securityContext": {
+      "required": [],
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "containerPort": {
+          "default": "80",
+          "maximum": 65535,
+          "minimum": 1,
+          "required": [],
+          "title": "containerPort"
+        },
+        "enabled": {
+          "default": true,
+          "description": "Defaults to true to preserve the behavior of existing chart consumers.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "http",
+          "title": "name",
+          "type": "string"
+        },
+        "port": {
+          "default": "80",
+          "maximum": 65535,
+          "minimum": 1,
+          "required": [],
+          "title": "port"
+        },
+        "protocol": {
+          "default": "TCP",
+          "title": "protocol",
+          "type": "string"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "automount": {
+          "default": true,
+          "title": "automount",
+          "type": "boolean"
+        },
+        "create": {
+          "default": false,
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "serviceName": {
+      "default": "",
+      "description": "StatefulSet service name. Defaults to the workload full name when empty.",
+      "title": "serviceName",
+      "type": "string"
+    },
+    "startupProbe": {
+      "default": "false",
+      "description": "Probes are opt-in and entirely consumer-defined. Set a complete probe object\nto enable it or false to omit it.",
+      "oneOf": [
+        {
+          "required": [],
+          "type": "object"
+        },
+        {
+          "const": false,
+          "required": []
+        }
+      ],
+      "required": [],
+      "title": "startupProbe"
+    },
+    "strategy": {
+      "description": "Deployment strategy. Ignored for DaemonSet and StatefulSet.",
+      "required": [],
+      "title": "strategy",
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "null",
+      "minimum": 0,
+      "required": [],
+      "title": "terminationGracePeriodSeconds",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "tolerations": {
+      "items": {
+        "required": []
+      },
+      "title": "tolerations",
+      "type": "array"
+    },
+    "topologySpreadConstraints": {
+      "items": {
+        "required": []
+      },
+      "title": "topologySpreadConstraints",
+      "type": "array"
+    },
+    "updateStrategy": {
+      "description": "DaemonSet or StatefulSet update strategy.",
+      "required": [],
+      "title": "updateStrategy",
+      "type": "object"
+    },
+    "volumeClaimTemplates": {
+      "description": "StatefulSet volume claim templates.",
+      "items": {
+        "required": []
+      },
+      "title": "volumeClaimTemplates",
+      "type": "array"
+    },
+    "volumeMounts": {
+      "items": {
+        "required": []
+      },
+      "title": "volumeMounts",
+      "type": "array"
+    },
+    "volumes": {
+      "items": {
+        "required": []
+      },
+      "title": "volumes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "image"
+  ],
+  "title": "Workload chart values",
+  "type": "object"
+}
