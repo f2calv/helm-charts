@@ -1,0 +1,14 @@
+{{- $kind := default "Deployment" .Values.kind -}}
+{{- if and .Values.service.enabled (has $kind (list "Deployment" "DaemonSet" "StatefulSet" "ScaledObject")) -}}
+{{- $fullName := include "workload.fullname" . -}}
+{{- if .Values.ingress.enabled }}
+{{- include "workload.ingress" (dict "root" . "name" $fullName "serviceName" $fullName "spec" .Values.ingress) | nindent 0 }}
+{{- end }}
+{{- range $extra := .Values.extraIngresses }}
+{{- if $extra.enabled }}
+---
+{{- $name := printf "%s-%s" $fullName (required "extraIngresses[].nameSuffix is required" $extra.nameSuffix) -}}
+{{- include "workload.ingress" (dict "root" $ "name" $name "serviceName" $fullName "spec" $extra) | nindent 0 }}
+{{- end }}
+{{- end }}
+{{- end }}

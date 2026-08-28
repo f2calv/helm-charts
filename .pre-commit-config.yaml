@@ -15,8 +15,7 @@ default_install_hook_types: [pre-push]
 exclude: |
   (?x)^(
     \.editorconfig|
-    \.devcontainer/devcontainer\.json|
-    charts/.*
+    \.devcontainer/devcontainer\.json
   )$
 
 repos:
@@ -27,6 +26,7 @@ repos:
   - id: check-xml
   - id: check-yaml
     args: [--allow-multiple-documents]
+    exclude: ^charts/.*/templates/
   - id: check-toml
   - id: check-merge-conflict
   - id: check-case-conflict
@@ -56,3 +56,13 @@ repos:
   hooks:
   - id: markdownlint
     args: ["--disable", "MD013", "--disable", "MD034", "--"]
+- repo: https://github.com/dadav/helm-schema
+  rev: 0.23.5
+  hooks:
+  - id: helm-schema
+    args:
+    - --chart-search-root=charts
+    - --no-dependencies
+    - --append-newline
+    - --skip-auto-generation=required
+    - --skip-auto-generation=additionalProperties

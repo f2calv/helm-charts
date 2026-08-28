@@ -1,0 +1,266 @@
+# @schema.root
+# title: Workload chart values
+# additionalProperties: true
+# required: [image]
+# @schema.root
+# Default values for the workload chart.
+
+# @schema
+# minimum: 0
+# @schema
+replicaCount: 0
+
+# @schema
+# enum: [Deployment, DaemonSet, StatefulSet, ScaledObject, ScaledJob, CronJob]
+# @schema
+# Workload kind that determines the primary resource rendered.
+kind: Deployment
+
+# Optional namespace override for resources rendered by this chart.
+namespaceOverride: ""
+
+# StatefulSet service name. Defaults to the workload full name when empty.
+serviceName: ""
+
+# @schema
+# minimum: 0
+# @schema
+revisionHistoryLimit: 3
+
+# Deployment strategy. Ignored for DaemonSet and StatefulSet.
+strategy: {}
+
+# DaemonSet or StatefulSet update strategy.
+updateStrategy: {}
+
+# StatefulSet volume claim templates.
+volumeClaimTemplates: []
+
+# CronJob settings.
+cronJobSchedule: ""
+cronJobConcurrencyPolicy: Replace
+
+# Pod execution settings. Leave empty for a kind-specific default.
+restartPolicy: ""
+runtimeClassName: ""
+hostNetwork: false
+dnsPolicy: ""
+# @schema
+# type: [integer, "null"]
+# minimum: 0
+# @schema
+terminationGracePeriodSeconds: null
+
+# @schema
+# additionalProperties: false
+# required: [repository, pullPolicy]
+# @schema
+image:
+  # @schema
+  # minLength: 1
+  # pattern: ^\S+$
+  # @schema
+  repository: busybox
+  # @schema
+  # enum: [Always, Never, IfNotPresent]
+  # @schema
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+
+# Override the container entrypoint command and arguments.
+command: []
+args: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  # Defaults to true to preserve the behavior of existing chart consumers.
+  enabled: true
+  name: http
+  type: ClusterIP
+  # @schema
+  # minimum: 1
+  # maximum: 65535
+  # @schema
+  port: 80
+  # @schema
+  # minimum: 1
+  # maximum: 65535
+  # @schema
+  containerPort: 80
+  protocol: TCP
+  annotations: {}
+
+# Additional container and Service ports beyond the primary port.
+extraPorts: []
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  # @schema
+  # oneOf:
+  #   - type: integer
+  #     minimum: 1
+  #     maximum: 65535
+  #   - const: ""
+  # @schema
+  # Override the Service port targeted by the ingress backend.
+  servicePort: ""
+  hosts:
+    - host: example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# Additional Ingress resources targeting this workload's Service.
+extraIngresses: []
+
+resources: {}
+
+# Probes are opt-in and entirely consumer-defined. Set a complete probe object
+# to enable it or false to omit it.
+# @schema
+# oneOf:
+#   - type: object
+#   - const: false
+# @schema
+startupProbe: false
+# @schema
+# oneOf:
+#   - type: object
+#   - const: false
+# @schema
+readinessProbe: false
+# @schema
+# oneOf:
+#   - type: object
+#   - const: false
+# @schema
+livenessProbe: false
+
+lifecycle: {}
+
+autoscaling:
+  enabled: false
+
+initContainers: []
+extraContainers: []
+volumes: []
+volumeMounts: []
+persistentVolumeClaims: []
+configMaps: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []
+
+# @schema
+# type: [object, "null"]
+# additionalProperties:
+#   type: string
+# @schema
+# Downward API environment variables. Use null to clear inherited entries.
+envFieldRef: {}
+
+# @schema
+# additionalProperties:
+#   type: [string, number, boolean]
+# @schema
+envVars: {}
+
+# @schema
+# additionalProperties:
+#   type: string
+# @schema
+envSecrets: {}
+
+# Sources passed directly to the container envFrom list.
+envVarsFrom: {}
+
+# Optional one-shot batch Job that uses the same image and shared pod settings.
+job:
+  enabled: false
+  nameSuffix: job
+  annotations: {}
+  command: []
+  args: []
+  # @schema
+  # additionalProperties:
+  #   type: [string, number, boolean]
+  # @schema
+  env: {}
+  resources: {}
+  restartPolicy: Never
+  # @schema
+  # minimum: 0
+  # @schema
+  ttlSecondsAfterFinished: 360
+  # @schema
+  # minimum: 0
+  # @schema
+  backoffLimit: 1
+
+# KEDA settings used by ScaledObject and ScaledJob workloads.
+keda:
+  # @schema
+  # minimum: 1
+  # @schema
+  pollingInterval: 10
+  # @schema
+  # minimum: 0
+  # @schema
+  cooldownPeriod: 300
+  # @schema
+  # minimum: 0
+  # @schema
+  minReplicaCount: 1
+  # @schema
+  # minimum: 0
+  # @schema
+  maxReplicaCount: 2
+  # @schema
+  # type: [string, integer]
+  # @schema
+  databaseIndex: ""
+  # @schema
+  # minimum: 0
+  # @schema
+  successfulJobsHistoryLimit: 5
+  # @schema
+  # minimum: 0
+  # @schema
+  failedJobsHistoryLimit: 5
+  # @schema
+  # enum: [default, gradual]
+  # @schema
+  rolloutStrategy: gradual
+  jobTargetRef:
+    # @schema
+    # minimum: 1
+    # @schema
+    activeDeadlineSeconds: 600
+    # @schema
+    # minimum: 0
+    # @schema
+    backoffLimit: 6
+  # Trigger metadata remains open because its shape is scaler-specific.
+  triggers: []
+  triggerAuthentications: []

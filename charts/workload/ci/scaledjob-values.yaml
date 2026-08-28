@@ -1,0 +1,17 @@
+kind: ScaledJob
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+command:
+  - sh
+  - -c
+args:
+  - echo processing
+keda:
+  triggers:
+    - type: cron
+      metadata:
+        timezone: UTC
+        start: 0 * * * *
+        end: 5 * * * *
+        desiredReplicas: "1"

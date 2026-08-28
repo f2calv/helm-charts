@@ -1,0 +1,10 @@
+kind: CronJob
+cronJobSchedule: "*/5 * * * *"
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+command:
+  - sh
+  - -c
+args:
+  - echo scheduled
