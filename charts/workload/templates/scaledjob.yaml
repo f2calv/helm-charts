@@ -105,6 +105,10 @@ spec:
         tolerations:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- with .Values.topologySpreadConstraints }}
+        topologySpreadConstraints:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
   pollingInterval: {{ .Values.keda.pollingInterval }}
   successfulJobsHistoryLimit: {{ .Values.keda.successfulJobsHistoryLimit }}
   failedJobsHistoryLimit: {{ .Values.keda.failedJobsHistoryLimit }}

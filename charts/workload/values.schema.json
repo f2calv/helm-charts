@@ -501,6 +501,66 @@
       "title": "podAnnotations",
       "type": "object"
     },
+    "podDisruptionBudget": {
+      "description": "PodDisruptionBudget support is limited to long-running workload kinds.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "maxUnavailable": {
+          "default": "null",
+          "oneOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "pattern": "^(?:100|[0-9]{1,2})%$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "required": [],
+          "title": "maxUnavailable"
+        },
+        "minAvailable": {
+          "default": "1",
+          "description": "Set to null when using maxUnavailable instead.",
+          "oneOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "pattern": "^(?:100|[0-9]{1,2})%$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "required": [],
+          "title": "minAvailable"
+        },
+        "unhealthyPodEvictionPolicy": {
+          "default": "",
+          "enum": [
+            "IfHealthyBudget",
+            "AlwaysAllow",
+            ""
+          ],
+          "required": [],
+          "title": "unhealthyPodEvictionPolicy"
+        }
+      },
+      "required": [],
+      "title": "podDisruptionBudget",
+      "type": "object"
+    },
     "podLabels": {
       "required": [],
       "title": "podLabels",

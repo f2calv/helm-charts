@@ -1,0 +1,46 @@
+replicaCount: 2
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+service:
+  enabled: false
+command:
+  - sh
+  - -c
+args:
+  - sleep 3600
+nodeSelector:
+  kubernetes.io/os: linux
+tolerations:
+  - key: dedicated
+    operator: Equal
+    value: workloads
+    effect: NoSchedule
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/arch
+              operator: In
+              values:
+                - amd64
+                - arm64
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: workload
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  unhealthyPodEvictionPolicy: IfHealthyBudget
+job:
+  enabled: true
+  command:
+    - sh
+    - -c
+  args:
+    - echo scheduled
