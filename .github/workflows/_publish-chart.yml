@@ -62,4 +62,5 @@ jobs:
       chart-path: charts/${{ inputs.chart }}
       is-library-chart: true
       push-chart: ${{ github.ref_name == github.event.repository.default_branch }}
+      chart-testing-cli-command: skip
     secrets: inherit

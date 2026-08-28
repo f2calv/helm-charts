@@ -1,654 +1,719 @@
 {
-    "$schema": "https://json-schema.org/draft-07/schema#",
-    "title": "Workload chart values",
-    "type": "object",
-    "required": [
-        "image"
-    ],
-    "properties": {
-        "replicaCount": {
-            "type": "integer",
-            "minimum": 0
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": true,
+  "properties": {
+    "affinity": {
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "args": {
+      "items": {
+        "required": []
+      },
+      "title": "args",
+      "type": "array"
+    },
+    "autoscaling": {
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "title": "autoscaling",
+      "type": "object"
+    },
+    "command": {
+      "description": "Override the container entrypoint command and arguments.",
+      "items": {
+        "required": []
+      },
+      "title": "command",
+      "type": "array"
+    },
+    "configMaps": {
+      "items": {
+        "required": []
+      },
+      "title": "configMaps",
+      "type": "array"
+    },
+    "cronJobConcurrencyPolicy": {
+      "default": "Replace",
+      "title": "cronJobConcurrencyPolicy",
+      "type": "string"
+    },
+    "cronJobSchedule": {
+      "default": "",
+      "description": "CronJob settings.",
+      "title": "cronJobSchedule",
+      "type": "string"
+    },
+    "dnsPolicy": {
+      "default": "",
+      "title": "dnsPolicy",
+      "type": "string"
+    },
+    "envFieldRef": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Downward API environment variables. Use null to clear inherited entries.",
+      "required": [],
+      "title": "envFieldRef",
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "envSecrets": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "required": [],
+      "title": "envSecrets"
+    },
+    "envVars": {
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean"
+        ]
+      },
+      "required": [],
+      "title": "envVars"
+    },
+    "envVarsFrom": {
+      "description": "Sources passed directly to the container envFrom list.",
+      "required": [],
+      "title": "envVarsFrom",
+      "type": "object"
+    },
+    "extraContainers": {
+      "items": {
+        "required": []
+      },
+      "title": "extraContainers",
+      "type": "array"
+    },
+    "extraIngresses": {
+      "description": "Additional Ingress resources targeting this workload's Service.",
+      "items": {
+        "required": []
+      },
+      "title": "extraIngresses",
+      "type": "array"
+    },
+    "extraPorts": {
+      "description": "Additional container and Service ports beyond the primary port.",
+      "items": {
+        "required": []
+      },
+      "title": "extraPorts",
+      "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "hostNetwork": {
+      "default": false,
+      "title": "hostNetwork",
+      "type": "boolean"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": [
+            "Always",
+            "Never",
+            "IfNotPresent"
+          ],
+          "required": [],
+          "title": "pullPolicy"
         },
-        "kind": {
-            "type": "string",
-            "enum": [
-                "Deployment",
-                "DaemonSet",
-                "StatefulSet",
-                "ScaledObject",
-                "ScaledJob",
-                "CronJob"
-            ]
+        "repository": {
+          "default": "busybox",
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "required": [],
+          "title": "repository"
         },
-        "namespaceOverride": {
-            "type": "string"
+        "tag": {
+          "default": "",
+          "description": "Overrides the image tag whose default is the chart appVersion.",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "pullPolicy"
+      ],
+      "title": "image"
+    },
+    "imagePullSecrets": {
+      "items": {
+        "required": []
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
         },
-        "serviceName": {
-            "type": "string"
+        "className": {
+          "default": "",
+          "title": "className",
+          "type": "string"
         },
-        "revisionHistoryLimit": {
-            "type": "integer",
-            "minimum": 0
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
         },
-        "strategy": {
-            "type": "object"
-        },
-        "updateStrategy": {
-            "type": "object"
-        },
-        "volumeClaimTemplates": {
-            "type": "array",
-            "items": {
-                "type": "object"
-            }
-        },
-        "cronJobSchedule": {
-            "type": "string"
-        },
-        "cronJobConcurrencyPolicy": {
-            "type": "string",
-            "enum": [
-                "Allow",
-                "Forbid",
-                "Replace"
-            ]
-        },
-        "restartPolicy": {
-            "type": "string",
-            "enum": [
-                "",
-                "Always",
-                "OnFailure",
-                "Never"
-            ]
-        },
-        "runtimeClassName": {
-            "type": "string"
-        },
-        "hostNetwork": {
-            "type": "boolean"
-        },
-        "dnsPolicy": {
-            "type": "string"
-        },
-        "terminationGracePeriodSeconds": {
-            "type": [
-                "integer",
-                "null"
-            ],
-            "minimum": 0
-        },
-        "image": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "repository",
-                "pullPolicy"
-            ],
-            "properties": {
-                "repository": {
-                    "type": "string",
-                    "minLength": 1,
-                    "pattern": "^\\S+$"
-                },
-                "pullPolicy": {
-                    "type": "string",
-                    "enum": [
-                        "Always",
-                        "Never",
-                        "IfNotPresent"
-                    ]
-                },
-                "tag": {
+        "hosts": {
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "host": {
+                    "default": "example.local",
+                    "title": "host",
                     "type": "string"
-                }
-            }
-        },
-        "imagePullSecrets": {
-            "type": "array",
-            "items": {
+                  },
+                  "paths": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "path": {
+                              "default": "/",
+                              "title": "path",
+                              "type": "string"
+                            },
+                            "pathType": {
+                              "default": "ImplementationSpecific",
+                              "title": "pathType",
+                              "type": "string"
+                            }
+                          },
+                          "required": [],
+                          "type": "object"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "paths",
+                    "type": "array"
+                  }
+                },
+                "required": [],
                 "type": "object"
-            }
+              }
+            ],
+            "required": []
+          },
+          "title": "hosts",
+          "type": "array"
         },
-        "command": {
-            "type": "array",
-            "items": {
-                "type": "string"
+        "servicePort": {
+          "default": "",
+          "description": "Override the Service port targeted by the ingress backend.",
+          "oneOf": [
+            {
+              "maximum": 65535,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "const": "",
+              "required": []
             }
+          ],
+          "required": [],
+          "title": "servicePort"
+        },
+        "tls": {
+          "items": {
+            "required": []
+          },
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "ingress",
+      "type": "object"
+    },
+    "initContainers": {
+      "items": {
+        "required": []
+      },
+      "title": "initContainers",
+      "type": "array"
+    },
+    "job": {
+      "description": "Optional one-shot batch Job that uses the same image and shared pod settings.",
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
         },
         "args": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
+          "items": {
+            "required": []
+          },
+          "title": "args",
+          "type": "array"
         },
-        "nameOverride": {
-            "type": "string"
+        "backoffLimit": {
+          "default": "1",
+          "minimum": 0,
+          "required": [],
+          "title": "backoffLimit"
         },
-        "fullnameOverride": {
-            "type": "string"
+        "command": {
+          "items": {
+            "required": []
+          },
+          "title": "command",
+          "type": "array"
         },
-        "serviceAccount": {
-            "type": "object",
-            "properties": {
-                "create": {
-                    "type": "boolean"
-                },
-                "automount": {
-                    "type": "boolean"
-                },
-                "annotations": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
         },
-        "podAnnotations": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "string"
-            }
+        "env": {
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "required": [],
+          "title": "env"
         },
-        "podLabels": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "string"
-            }
-        },
-        "podSecurityContext": {
-            "type": "object"
-        },
-        "securityContext": {
-            "type": "object"
-        },
-        "service": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "ClusterIP",
-                        "NodePort",
-                        "LoadBalancer"
-                    ]
-                },
-                "port": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 65535
-                },
-                "containerPort": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 65535
-                },
-                "protocol": {
-                    "type": "string",
-                    "enum": [
-                        "TCP",
-                        "UDP",
-                        "SCTP"
-                    ]
-                },
-                "annotations": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "extraPorts": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "port",
-                    "containerPort"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "port": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 65535
-                    },
-                    "containerPort": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 65535
-                    },
-                    "protocol": {
-                        "type": "string",
-                        "enum": [
-                            "TCP",
-                            "UDP",
-                            "SCTP"
-                        ]
-                    }
-                }
-            }
-        },
-        "ingress": {
-            "$ref": "#/definitions/ingress"
-        },
-        "extraIngresses": {
-            "type": "array",
-            "items": {
-                "allOf": [
-                    {
-                        "$ref": "#/definitions/ingress"
-                    },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "nameSuffix": {
-                                "type": "string",
-                                "minLength": 1
-                            }
-                        }
-                    }
-                ]
-            }
+        "nameSuffix": {
+          "default": "job",
+          "title": "nameSuffix",
+          "type": "string"
         },
         "resources": {
-            "type": "object"
+          "required": [],
+          "title": "resources",
+          "type": "object"
         },
-        "startupProbe": {
-            "$ref": "#/definitions/probe"
+        "restartPolicy": {
+          "default": "Never",
+          "title": "restartPolicy",
+          "type": "string"
         },
-        "readinessProbe": {
-            "$ref": "#/definitions/probe"
-        },
-        "livenessProbe": {
-            "$ref": "#/definitions/probe"
-        },
-        "lifecycle": {
-            "type": "object"
-        },
-        "autoscaling": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "initContainers": {
-            "$ref": "#/definitions/objectArray"
-        },
-        "extraContainers": {
-            "$ref": "#/definitions/objectArray"
-        },
-        "volumes": {
-            "$ref": "#/definitions/objectArray"
-        },
-        "volumeMounts": {
-            "$ref": "#/definitions/objectArray"
-        },
-        "persistentVolumeClaims": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "accessModes",
-                    "storage"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "storageClassName": {
-                        "type": "string"
-                    },
-                    "accessModes": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "minItems": 1
-                    },
-                    "storage": {
-                        "type": "string",
-                        "minLength": 1
-                    }
-                }
-            }
-        },
-        "configMaps": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "data"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "data": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "nodeSelector": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "string"
-            }
-        },
-        "tolerations": {
-            "$ref": "#/definitions/objectArray"
-        },
-        "affinity": {
-            "type": "object"
-        },
-        "topologySpreadConstraints": {
-            "$ref": "#/definitions/objectArray"
-        },
-        "envFieldRef": {
-            "type": [
-                "object",
-                "null"
-            ],
-            "additionalProperties": {
-                "type": "string"
-            }
-        },
-        "envVars": {
-            "type": "object",
-            "additionalProperties": {
-                "type": [
-                    "string",
-                    "number",
-                    "boolean"
-                ]
-            }
-        },
-        "envSecrets": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "string"
-            }
-        },
-        "envVarsFrom": {
-            "type": "object"
-        },
-        "job": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "nameSuffix": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "annotations": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "command": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "args": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "env": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": [
-                            "string",
-                            "number",
-                            "boolean"
-                        ]
-                    }
-                },
-                "resources": {
-                    "type": "object"
-                },
-                "restartPolicy": {
-                    "type": "string",
-                    "enum": [
-                        "OnFailure",
-                        "Never"
-                    ]
-                },
-                "ttlSecondsAfterFinished": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "backoffLimit": {
-                    "type": "integer",
-                    "minimum": 0
-                }
-            }
-        },
-        "keda": {
-            "type": "object",
-            "properties": {
-                "pollingInterval": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "cooldownPeriod": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "minReplicaCount": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "maxReplicaCount": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "databaseIndex": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
-                },
-                "successfulJobsHistoryLimit": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "failedJobsHistoryLimit": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "rolloutStrategy": {
-                    "type": "string",
-                    "enum": [
-                        "default",
-                        "gradual"
-                    ]
-                },
-                "jobTargetRef": {
-                    "type": "object",
-                    "properties": {
-                        "activeDeadlineSeconds": {
-                            "type": "integer",
-                            "minimum": 1
-                        },
-                        "backoffLimit": {
-                            "type": "integer",
-                            "minimum": 0
-                        }
-                    }
-                },
-                "triggers": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "type",
-                            "metadata"
-                        ],
-                        "properties": {
-                            "type": {
-                                "type": "string",
-                                "minLength": 1
-                            },
-                            "metadata": {
-                                "type": "object",
-                                "additionalProperties": true
-                            },
-                            "authenticationRef": {
-                                "type": "object",
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "minLength": 1
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "triggerAuthentications": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "name",
-                            "spec"
-                        ],
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "minLength": 1
-                            },
-                            "spec": {
-                                "type": "object"
-                            }
-                        }
-                    }
-                }
-            }
+        "ttlSecondsAfterFinished": {
+          "default": "360",
+          "minimum": 0,
+          "required": [],
+          "title": "ttlSecondsAfterFinished"
         }
+      },
+      "required": [],
+      "title": "job",
+      "type": "object"
     },
-    "definitions": {
-        "objectArray": {
-            "type": "array",
-            "items": {
-                "type": "object"
-            }
+    "keda": {
+      "description": "KEDA settings used by ScaledObject and ScaledJob workloads.",
+      "properties": {
+        "cooldownPeriod": {
+          "default": "300",
+          "minimum": 0,
+          "required": [],
+          "title": "cooldownPeriod"
         },
-        "probe": {
-            "oneOf": [
-                {
-                    "type": "object"
-                },
-                {
-                    "const": false
-                }
-            ]
+        "databaseIndex": {
+          "default": "",
+          "required": [],
+          "title": "databaseIndex",
+          "type": [
+            "string",
+            "integer"
+          ]
         },
-        "ingress": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "className": {
-                    "type": "string"
-                },
-                "annotations": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "servicePort": {
-                    "oneOf": [
-                        {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 65535
-                        },
-                        {
-                            "const": ""
-                        }
-                    ]
-                },
-                "hosts": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "host",
-                            "paths"
-                        ],
-                        "properties": {
-                            "host": {
-                                "type": "string"
-                            },
-                            "paths": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "required": [
-                                        "path"
-                                    ],
-                                    "properties": {
-                                        "path": {
-                                            "type": "string"
-                                        },
-                                        "pathType": {
-                                            "type": "string",
-                                            "enum": [
-                                                "Exact",
-                                                "Prefix",
-                                                "ImplementationSpecific"
-                                            ]
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tls": {
-                    "type": "array",
-                    "items": {
-                        "type": "object"
-                    }
-                }
+        "failedJobsHistoryLimit": {
+          "default": "5",
+          "minimum": 0,
+          "required": [],
+          "title": "failedJobsHistoryLimit"
+        },
+        "jobTargetRef": {
+          "properties": {
+            "activeDeadlineSeconds": {
+              "default": "600",
+              "minimum": 1,
+              "required": [],
+              "title": "activeDeadlineSeconds"
+            },
+            "backoffLimit": {
+              "default": "6",
+              "minimum": 0,
+              "required": [],
+              "title": "backoffLimit"
             }
+          },
+          "required": [],
+          "title": "jobTargetRef",
+          "type": "object"
+        },
+        "maxReplicaCount": {
+          "default": "2",
+          "minimum": 0,
+          "required": [],
+          "title": "maxReplicaCount"
+        },
+        "minReplicaCount": {
+          "default": "1",
+          "minimum": 0,
+          "required": [],
+          "title": "minReplicaCount"
+        },
+        "pollingInterval": {
+          "default": "10",
+          "minimum": 1,
+          "required": [],
+          "title": "pollingInterval"
+        },
+        "rolloutStrategy": {
+          "default": "gradual",
+          "enum": [
+            "default",
+            "gradual"
+          ],
+          "required": [],
+          "title": "rolloutStrategy"
+        },
+        "successfulJobsHistoryLimit": {
+          "default": "5",
+          "minimum": 0,
+          "required": [],
+          "title": "successfulJobsHistoryLimit"
+        },
+        "triggerAuthentications": {
+          "items": {
+            "required": []
+          },
+          "title": "triggerAuthentications",
+          "type": "array"
+        },
+        "triggers": {
+          "description": "Trigger metadata remains open because its shape is scaler-specific.",
+          "items": {
+            "required": []
+          },
+          "title": "triggers",
+          "type": "array"
         }
+      },
+      "required": [],
+      "title": "keda",
+      "type": "object"
+    },
+    "kind": {
+      "default": "Deployment",
+      "description": "Workload kind that determines the primary resource rendered.",
+      "enum": [
+        "Deployment",
+        "DaemonSet",
+        "StatefulSet",
+        "ScaledObject",
+        "ScaledJob",
+        "CronJob"
+      ],
+      "required": [],
+      "title": "kind"
+    },
+    "lifecycle": {
+      "required": [],
+      "title": "lifecycle",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "default": "false",
+      "oneOf": [
+        {
+          "required": [],
+          "type": "object"
+        },
+        {
+          "const": false,
+          "required": []
+        }
+      ],
+      "required": [],
+      "title": "livenessProbe"
+    },
+    "nameOverride": {
+      "default": "",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "namespaceOverride": {
+      "default": "",
+      "description": "Optional namespace override for resources rendered by this chart.",
+      "title": "namespaceOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "persistentVolumeClaims": {
+      "items": {
+        "required": []
+      },
+      "title": "persistentVolumeClaims",
+      "type": "array"
+    },
+    "podAnnotations": {
+      "required": [],
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "podLabels": {
+      "required": [],
+      "title": "podLabels",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "default": "false",
+      "oneOf": [
+        {
+          "required": [],
+          "type": "object"
+        },
+        {
+          "const": false,
+          "required": []
+        }
+      ],
+      "required": [],
+      "title": "readinessProbe"
+    },
+    "replicaCount": {
+      "default": "0",
+      "minimum": 0,
+      "required": [],
+      "title": "replicaCount"
+    },
+    "resources": {
+      "required": [],
+      "title": "resources",
+      "type": "object"
+    },
+    "restartPolicy": {
+      "default": "",
+      "description": "Pod execution settings. Leave empty for a kind-specific default.",
+      "title": "restartPolicy",
+      "type": "string"
+    },
+    "revisionHistoryLimit": {
+      "default": "3",
+      "minimum": 0,
+      "required": [],
+      "title": "revisionHistoryLimit"
+    },
+    "runtimeClassName": {
+      "default": "",
+      "title": "runtimeClassName",
+      "type": "string"
+    },
+    "securityContext": {
+      "required": [],
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "containerPort": {
+          "default": "80",
+          "maximum": 65535,
+          "minimum": 1,
+          "required": [],
+          "title": "containerPort"
+        },
+        "enabled": {
+          "default": true,
+          "description": "Defaults to true to preserve the behavior of existing chart consumers.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "http",
+          "title": "name",
+          "type": "string"
+        },
+        "port": {
+          "default": "80",
+          "maximum": 65535,
+          "minimum": 1,
+          "required": [],
+          "title": "port"
+        },
+        "protocol": {
+          "default": "TCP",
+          "title": "protocol",
+          "type": "string"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "properties": {
+        "annotations": {
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "automount": {
+          "default": true,
+          "title": "automount",
+          "type": "boolean"
+        },
+        "create": {
+          "default": false,
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "serviceName": {
+      "default": "",
+      "description": "StatefulSet service name. Defaults to the workload full name when empty.",
+      "title": "serviceName",
+      "type": "string"
+    },
+    "startupProbe": {
+      "default": "false",
+      "description": "Probes are opt-in and entirely consumer-defined. Set a complete probe object\nto enable it or false to omit it.",
+      "oneOf": [
+        {
+          "required": [],
+          "type": "object"
+        },
+        {
+          "const": false,
+          "required": []
+        }
+      ],
+      "required": [],
+      "title": "startupProbe"
+    },
+    "strategy": {
+      "description": "Deployment strategy. Ignored for DaemonSet and StatefulSet.",
+      "required": [],
+      "title": "strategy",
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": "null",
+      "minimum": 0,
+      "required": [],
+      "title": "terminationGracePeriodSeconds",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "tolerations": {
+      "items": {
+        "required": []
+      },
+      "title": "tolerations",
+      "type": "array"
+    },
+    "topologySpreadConstraints": {
+      "items": {
+        "required": []
+      },
+      "title": "topologySpreadConstraints",
+      "type": "array"
+    },
+    "updateStrategy": {
+      "description": "DaemonSet or StatefulSet update strategy.",
+      "required": [],
+      "title": "updateStrategy",
+      "type": "object"
+    },
+    "volumeClaimTemplates": {
+      "description": "StatefulSet volume claim templates.",
+      "items": {
+        "required": []
+      },
+      "title": "volumeClaimTemplates",
+      "type": "array"
+    },
+    "volumeMounts": {
+      "items": {
+        "required": []
+      },
+      "title": "volumeMounts",
+      "type": "array"
+    },
+    "volumes": {
+      "items": {
+        "required": []
+      },
+      "title": "volumes",
+      "type": "array"
     }
+  },
+  "required": [
+    "image"
+  ],
+  "title": "Workload chart values",
+  "type": "object"
 }
