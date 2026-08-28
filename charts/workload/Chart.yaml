@@ -2,5 +2,5 @@ apiVersion: v2
 name: workload
 description: A generic Helm chart for deploying a single containerized workload as a Deployment, DaemonSet, StatefulSet, ScaledObject, ScaledJob, or CronJob.
 type: application
-version: 1.0.0
-appVersion: "1.0.0"
+version: 1.0.1
+appVersion: "1.0.1"

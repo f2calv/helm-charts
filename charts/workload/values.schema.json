@@ -89,9 +89,12 @@
     },
     "envVarsFrom": {
       "description": "Sources passed directly to the container envFrom list.",
-      "required": [],
+      "items": {
+        "required": [],
+        "type": "object"
+      },
       "title": "envVarsFrom",
-      "type": "object"
+      "type": "array"
     },
     "extraContainers": {
       "items": {
