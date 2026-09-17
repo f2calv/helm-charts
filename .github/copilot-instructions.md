@@ -1,25 +1,12 @@
 # Copilot Instructions
 
-## Instruction Files
+## Shared Instructions
 
-Detailed conventions live in scoped instruction files under
-`.github/instructions/`, auto-applied by file type:
+Shared Copilot instruction files are maintained centrally in the [.github](https://github.com/f2calv/.github) repository under `instructions/`, and are applied to every workspace from the VS Code user profile via `~/.copilot/instructions`. They are deliberately not copied into this repository, so a change there takes effect everywhere without a pull request here.
 
-| File | Applies to | Covers |
-| --- | --- | --- |
-| `helm.instructions.md` | `charts/**` | Helm chart authoring conventions, values.schema.json, dependency wiring |
+Everything below is specific to this repository.
 
-The conventions below always apply, regardless of the file being edited.
+## Maintaining Conventions
 
-## Public Repository Confidentiality
-
-* Treat every non-public repository's identity and contents as confidential, even when they appear in the local workspace, conversation context, diffs, logs, or tool output.
-* Never publish private repository names, URLs, owner/repository coordinates, branches, file paths, architecture, deployment details, or inferred existence in tracked files, commit messages, issues, pull request titles/descriptions/reviews/comments, release notes, workflow annotations, examples, or other public-facing content.
-* Describe required relationships generically (for example, "private GitOps repository" or "internal service") and supply private coordinates only through secrets, repository variables, or caller-provided values.
-* Before creating or updating public GitHub content, review the proposed text and metadata for private identifiers and implementation details.
-
-## Misc
-
-* When detecting new chart conventions or patterns, add them to
-  `.github/instructions/helm.instructions.md` and apply them retroactively where
-  appropriate.
+- Add a shared or general Helm convention to `helm.instructions.md` in the central [.github](https://github.com/f2calv/.github) repository.
+- Keep only conventions specific to the charts in this repository here, and apply them retroactively where appropriate.
