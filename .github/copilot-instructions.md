@@ -1,18 +1,11 @@
 # Copilot Instructions
 
-## Instruction Files
+## Shared Instructions
 
-Detailed conventions live in scoped instruction files under
-`.github/instructions/`, auto-applied by file type:
+Shared Copilot instructions, skills and prompts are maintained centrally in the [.github](https://github.com/f2calv/.github) repository, under `.github/instructions/`, `.github/skills/` and `.github/prompts/`. They are deliberately not copied into this repository, so a change there takes effect everywhere without a pull request here.
 
-| File | Applies to | Covers |
-| --- | --- | --- |
-| `helm.instructions.md` | `charts/**` | Helm chart authoring conventions, values.schema.json, dependency wiring |
+To load them, clone that repository and either add it to this VS Code workspace, or link its folders into `~/.copilot/`. Its README explains both.
 
-The conventions below always apply, regardless of the file being edited.
+If those shared files are not visible, stop and tell the user rather than guessing the conventions — this repository depends on them.
 
-## Misc
-
-* When detecting new chart conventions or patterns, add them to
-  `.github/instructions/helm.instructions.md` and apply them retroactively where
-  appropriate.
+Everything below is specific to this repository.
