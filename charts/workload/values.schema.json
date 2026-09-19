@@ -490,8 +490,41 @@
       "type": "object"
     },
     "persistentVolumeClaims": {
+      "description": "PersistentVolumeClaims rendered and owned by this Helm release.",
       "items": {
-        "required": []
+        "additionalProperties": false,
+        "properties": {
+          "accessModes": {
+            "items": {
+              "enum": [
+                "ReadWriteOnce",
+                "ReadOnlyMany",
+                "ReadWriteMany",
+                "ReadWriteOncePod"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "storage": {
+            "pattern": "^[1-9][0-9]*(?:\\.[0-9]+)?(?:Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)$",
+            "type": "string"
+          },
+          "storageClassName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "accessModes",
+          "storage"
+        ],
+        "type": "object"
       },
       "title": "persistentVolumeClaims",
       "type": "array"

@@ -98,3 +98,29 @@ podDisruptionBudget:
 
 Availability values accept non-negative integers or percentages from `0%` to
 `100%`. `unhealthyPodEvictionPolicy` may be `IfHealthyBudget` or `AlwaysAllow`.
+
+## Persistent Volume Claims
+
+Declare PVCs alongside their consuming workload through `persistentVolumeClaims`.
+Each claim requires a name, one or more Kubernetes access modes, and a storage
+capacity. `storageClassName` is optional so clusters can use their default class.
+
+```yaml
+persistentVolumeClaims:
+  - name: model-cache
+    storageClassName: local-path
+    accessModes:
+      - ReadWriteOnce
+    storage: 50Gi
+volumes:
+  - name: models
+    persistentVolumeClaim:
+      claimName: model-cache
+volumeMounts:
+  - name: models
+    mountPath: /models
+```
+
+When migrating an existing claim from another GitOps owner, protect the live
+resource from pruning and reconcile that protection before transferring the
+declaration. Verify the claim UID and bound PV remain unchanged after adoption.
