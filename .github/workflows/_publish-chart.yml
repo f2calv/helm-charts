@@ -45,7 +45,7 @@ jobs:
       tag-and-release: false
     secrets: inherit
 
-  chart:
+  package:
     needs: [metadata, versioning]
     if: needs.versioning.outputs['release-exists'] == 'false'
     permissions:
@@ -64,6 +64,14 @@ jobs:
       push-chart: ${{ github.ref_name == github.event.repository.default_branch }}
       chart-testing-cli-command: skip
     secrets: inherit
+
+  chart:
+    needs: [package]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: helm chart package passed
+        run: 'true'
 
   release:
     needs: [metadata, versioning, chart]
