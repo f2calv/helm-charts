@@ -1,0 +1,11 @@
+# Ephemeral install: no volume, so the account must be re-registered after every restart.
+# Useful for a throwaway evaluation, never for a real deployment.
+signalcli:
+  envVars:
+    MODE: normal
+    LOG_LEVEL: debug
+    # An upstream variable the chart does not model, proving the open passthrough.
+    SIGNAL_CLI_REST_API_EXAMPLE: "1"
+  volumes: []
+  volumeMounts: []
+  persistentVolumeClaims: []

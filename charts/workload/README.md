@@ -15,6 +15,23 @@ The same chart supports .NET, Go, Rust, Java, and other containerised runtimes.
 Applications supply their image and runtime-specific configuration; the chart
 owns the reusable Kubernetes resource structure.
 
+## Install
+
+```bash
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.0.3
+```
+
+To depend on it from another chart:
+
+```yaml
+dependencies:
+  - name: workload
+    version: 1.0.3
+    repository: oci://ghcr.io/f2calv/charts
+```
+
+CI checks that every version shown here matches `Chart.yaml`, so these examples cannot go stale.
+
 ## Workload Kinds
 
 Set `kind` to one of the supported primary workload modes:
