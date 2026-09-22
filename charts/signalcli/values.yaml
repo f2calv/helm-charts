@@ -8,8 +8,12 @@ signalcli:
   # Without this the subchart names resources <release>-<alias>, e.g. signalcli-signalcli.
   fullnameOverride: signalcli
 
+  # @schema
+  # minimum: 0
+  # maximum: 1
+  # @schema
   # signal-cli registers one device against one account and keeps its state on one volume, so the
-  # wrapper cannot be scaled out. The schema caps this at 1.
+  # wrapper cannot be scaled out.
   replicaCount: 1
 
   image:
@@ -28,15 +32,93 @@ signalcli:
     containerPort: 8080
     protocol: TCP
 
-  # Upstream environment variables, named exactly as the image documents them.
+  # Upstream environment variables, named exactly as the image documents them. Declared here rather
+  # than as values so every variable the image supports is validated without being set. The map
+  # stays open, so a variable added by a newer image release can be set without a chart release.
+  #
+  # Booleans and integers accept both the YAML and quoted forms, because the workload chart renders
+  # `value: {{ $value | quote }}` and the two are therefore identical by the time the container
+  # sees them.
+  # @schema
+  # additionalProperties: true
+  # properties:
+  #   MODE:
+  #     description: >-
+  #       signal-cli execution model. Also decides the receive contract: json-rpc and
+  #       json-rpc-native make /v1/receive/{number} a WebSocket, the others leave it a GET.
+  #       normal is slowest, native is medium, json-rpc is fastest but holds a JVM resident,
+  #       json-rpc-native combines the last two.
+  #     enum: [normal, native, json-rpc, json-rpc-native]
+  #   AUTO_RECEIVE_SCHEDULE:
+  #     description: >-
+  #       Cron expression calling the receive endpoint, for normal and native mode only. Do not
+  #       set it while a consumer reads messages through the API: receive drains the queue from
+  #       the Signal server, so whichever caller arrives second gets nothing.
+  #     type: string
+  #     pattern: "^\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+$"
+  #   LOG_LEVEL:
+  #     enum: [debug, info, warn, error]
+  #   DEFAULT_SIGNAL_TEXT_MODE:
+  #     description: Text mode used when a send payload omits text_mode.
+  #     enum: [normal, styled]
+  #   PORT:
+  #     description: >-
+  #       Port the API listens on. Changing it alone breaks the service and both probes, which
+  #       address 8080 directly; change service.containerPort and the probe ports to match.
+  #     oneOf:
+  #       - type: integer
+  #         minimum: 1
+  #         maximum: 65535
+  #       - type: string
+  #         pattern: "^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
+  #   SIGNAL_CLI_CONFIG_DIR:
+  #     description: >-
+  #       Account state directory inside the container. Changing it alone silently discards the
+  #       registration, because the volume is still mounted at the old path; change volumeMounts
+  #       to match.
+  #     type: string
+  #     pattern: "^/"
+  #   SIGNAL_CLI_UID:
+  #     oneOf:
+  #       - type: integer
+  #         minimum: 0
+  #       - type: string
+  #         pattern: "^(0|[1-9][0-9]*)$"
+  #   SIGNAL_CLI_GID:
+  #     oneOf:
+  #       - type: integer
+  #         minimum: 0
+  #       - type: string
+  #         pattern: "^(0|[1-9][0-9]*)$"
+  #   SIGNAL_CLI_CHOWN_ON_STARTUP:
+  #     description: >-
+  #       Set false to skip the startup chown, which is slow on a volume holding many attachments
+  #       or sticker packs.
+  #     enum: [true, false, "true", "false"]
+  #   JSON_RPC_IGNORE_ATTACHMENTS:
+  #     enum: [true, false, "true", "false"]
+  #   JSON_RPC_IGNORE_STORIES:
+  #     enum: [true, false, "true", "false"]
+  #   JSON_RPC_IGNORE_AVATARS:
+  #     enum: [true, false, "true", "false"]
+  #   JSON_RPC_IGNORE_STICKERS:
+  #     description: >-
+  #       Set true to stop sticker packs being downloaded. Sticker packs are the largest single
+  #       consumer of volume space in a long-lived account.
+  #     enum: [true, false, "true", "false"]
+  #   JSON_RPC_TRUST_NEW_IDENTITIES:
+  #     description: How an unseen identity key is trusted in json-rpc mode.
+  #     enum: [on-first-use, always, never]
+  #   SWAGGER_HOST:
+  #     type: string
+  #     minLength: 1
+  #   SWAGGER_IP:
+  #     type: string
+  #     minLength: 1
+  #   SWAGGER_USE_HTTPS_AS_PREFERRED_SCHEME:
+  #     enum: [true, false, "true", "false"]
+  # @schema
   envVars:
-    # Selects the signal-cli execution model. This also decides the shape of the receive endpoint:
-    # json-rpc and json-rpc-native make /v1/receive/{number} a WebSocket, the other modes leave it
-    # a GET. Choose deliberately - a consumer written for one will not work against the other.
-    #   normal           slowest, normal memory
-    #   native           medium, normal memory
-    #   json-rpc         faster, increased memory
-    #   json-rpc-native  fastest, normal memory
     MODE: json-rpc
     LOG_LEVEL: info
 

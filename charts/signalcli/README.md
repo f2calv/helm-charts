@@ -67,6 +67,11 @@ Error: values don't meet the specifications of the schema(s) in the following ch
 - at '/signalcli/envVars/MODE': value must be one of 'normal', 'native', 'json-rpc', 'json-rpc-native'
 ```
 
+`values.schema.json` is generated from the `# @schema` annotations in `values.yaml` by
+[helm-schema](https://github.com/dadav/helm-schema), which runs as a pre-commit hook. Edit the
+annotations and regenerate; never edit the schema by hand, because the hook will overwrite it and
+fail the `lint` check.
+
 ### Validated environment variables
 
 | Variable | Accepted | Upstream default |
