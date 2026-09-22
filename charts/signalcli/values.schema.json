@@ -1,0 +1,43 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+        "signalCli": {
+            "description": "Values passed to the workload subchart. The subchart's own schema validates everything not constrained here.",
+            "type": "object",
+            "properties": {
+                "replicaCount": {
+                    "description": "signal-cli registers one device against one account and keeps state on one volume, so the wrapper cannot be scaled out.",
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "envVars": {
+                    "description": "Upstream environment variables. Kept open so a variable added by a newer image release can be set without waiting for a chart release; the variables the chart knows about are validated.",
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                        "MODE": {
+                            "description": "signal-cli execution model. json-rpc and json-rpc-native make /v1/receive/{number} a WebSocket; the others leave it a GET.",
+                            "enum": [
+                                "normal",
+                                "native",
+                                "json-rpc",
+                                "json-rpc-native"
+                            ]
+                        },
+                        "LOG_LEVEL": {
+                            "enum": [
+                                "debug",
+                                "info",
+                                "warn",
+                                "error"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -431,6 +431,8 @@ FodyWeavers.xsd
 # custom
 *.tgz
 *.lock
+# Charts with dependencies track their lock so the resolved subchart version is reproducible.
+!charts/*/Chart.lock
 manifest*
 
 # HVE / Copilot runtime artefacts

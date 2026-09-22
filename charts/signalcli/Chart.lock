@@ -1,0 +1,6 @@
+dependencies:
+- name: workload
+  repository: oci://ghcr.io/f2calv/charts
+  version: 1.0.3
+digest: sha256:2a2e725f1733f1dc0aec3d0ff668c57d92a2ece02ed775ff72b47137fda3dd39
+generated: "2026-09-22T05:46:35.1493643+02:00"

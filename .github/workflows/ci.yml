@@ -27,6 +27,7 @@ jobs:
       matrix:
         chart:
           - workload
+          - signalcli
     permissions:
       contents: write
       packages: write

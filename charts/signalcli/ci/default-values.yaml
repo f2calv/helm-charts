@@ -1,0 +1,7 @@
+# Default install: json-rpc mode with a persistent volume for account state.
+signalCli:
+  persistentVolumeClaims:
+    - name: signalcli-pvc
+      accessModes:
+        - ReadWriteOnce
+      storage: 512Mi

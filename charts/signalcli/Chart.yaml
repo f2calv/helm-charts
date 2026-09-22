@@ -1,0 +1,19 @@
+apiVersion: v2
+name: signalcli
+description: Deploys the bbernhard signal-cli-rest-api container, a REST and JSON-RPC wrapper around signal-cli.
+type: application
+version: 0.1.0
+appVersion: "0.100"
+home: https://github.com/bbernhard/signal-cli-rest-api
+sources:
+  - https://github.com/bbernhard/signal-cli-rest-api
+  - https://github.com/AsamK/signal-cli
+keywords:
+  - signal
+  - signal-cli
+  - messaging
+dependencies:
+  - name: workload
+    version: 1.0.3
+    repository: oci://ghcr.io/f2calv/charts
+    alias: signalCli
