@@ -1,5 +1,6 @@
 {
     "recommendations": [
+        "editorconfig.editorconfig",
         "ms-vscode.powershell",
         "ms-vscode.azurecli",
         "ms-azuretools.vscode-containers",

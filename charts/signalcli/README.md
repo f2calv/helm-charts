@@ -10,7 +10,7 @@ a JVM, and schema validation of the environment variables that change its behavi
 ## Install
 
 ```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version <version>
+helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 0.1.0
 ```
 
 The chart depends on [`workload`](../workload/README.md), pulled from `oci://ghcr.io/f2calv/charts`.
