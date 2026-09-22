@@ -16,4 +16,6 @@ dependencies:
   - name: workload
     version: 1.0.3
     repository: oci://ghcr.io/f2calv/charts
-    alias: signalCli
+    # Lowercase: Helm derives the subchart's resource names from the alias, and a Kubernetes
+    # resource name must be a DNS-1123 subdomain.
+    alias: signalcli

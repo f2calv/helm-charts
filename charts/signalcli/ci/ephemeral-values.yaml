@@ -1,6 +1,6 @@
 # Ephemeral install: no volume, so the account must be re-registered after every restart.
 # Useful for a throwaway evaluation, never for a real deployment.
-signalCli:
+signalcli:
   envVars:
     MODE: normal
     LOG_LEVEL: debug

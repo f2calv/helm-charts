@@ -1,10 +1,13 @@
 # Values for the signalcli chart.
 #
-# Everything below `signalCli` is passed to the `workload` subchart, so its keys are the workload
+# Everything below `signalcli` is passed to the `workload` subchart, so its keys are the workload
 # chart's keys. Environment variables keep their upstream names verbatim, so each one traces
 # directly back to the bbernhard signal-cli-rest-api documentation.
 
-signalCli:
+signalcli:
+  # Without this the subchart names resources <release>-<alias>, e.g. signalcli-signalcli.
+  fullnameOverride: signalcli
+
   # signal-cli registers one device against one account and keeps its state on one volume, so the
   # wrapper cannot be scaled out. The schema caps this at 1.
   replicaCount: 1
@@ -80,3 +83,8 @@ signalCli:
       accessModes:
         - ReadWriteOnce
       storage: 512Mi
+      # Left unset so a clean install works on any cluster, which means the default StorageClass is
+      # used. Set it explicitly for anything you intend to keep: a cluster can carry more than one
+      # default, in which case the most recently created one wins and you may silently land on a
+      # class that is neither replicated nor expandable.
+      # storageClassName: longhorn
