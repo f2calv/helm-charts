@@ -1,7 +1,6 @@
----
-title: Helm charts
-description: Shared Helm charts published as public OCI packages for Kubernetes workloads
----
+# Helm charts
+
+Shared Helm charts published as public OCI packages for Kubernetes workloads.
 
 ## Overview
 

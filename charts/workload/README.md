@@ -1,7 +1,7 @@
----
-title: Universal workload chart
-description: Deploy common Kubernetes workload kinds through one framework-neutral chart with sensible defaults
----
+# Universal workload chart
+
+Deploy common Kubernetes workload kinds through one framework-neutral chart with sensible
+defaults.
 
 ## Overview
 
