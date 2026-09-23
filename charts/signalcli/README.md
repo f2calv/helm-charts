@@ -154,6 +154,72 @@ Three of these are not independent, and the schema cannot enforce that for you:
   anything reads messages through the API. `receive` drains the queue from the Signal server, so
   whichever caller arrives second gets nothing.
 
+### Default Values
+
+```yaml
+signalcli:
+  # Resource naming and workload size.
+  fullnameOverride: signalcli
+  replicaCount: 1
+
+  # Container image and service.
+  image:
+    repository: bbernhard/signal-cli-rest-api
+    pullPolicy: IfNotPresent
+    tag: "0.100"
+  service:
+    enabled: true
+    name: http
+    type: ClusterIP
+    port: 80
+    containerPort: 8080
+    protocol: TCP
+
+  # Application environment.
+  envVars:
+    MODE: json-rpc
+    LOG_LEVEL: info
+
+  # Startup and readiness checks.
+  startupProbe:
+    httpGet:
+      path: /v1/about
+      port: 8080
+    periodSeconds: 10
+    initialDelaySeconds: 15
+    failureThreshold: 30
+  readinessProbe:
+    httpGet:
+      path: /v1/about
+      port: 8080
+    periodSeconds: 20
+    failureThreshold: 3
+  livenessProbe: false
+
+  # CPU and memory reservations and limits.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 2000m
+      memory: 768Mi
+
+  # Persistent account state.
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: signalcli-pvc
+  volumeMounts:
+    - name: data
+      mountPath: /home/.local/share/signal-cli
+  persistentVolumeClaims:
+    - name: signalcli-pvc
+      accessModes:
+        - ReadWriteOnce
+      storage: 512Mi
+```
+
 ## Persistence
 
 Account state is small and grows slowly. A volume carrying a linked account for five months held:
@@ -245,6 +311,7 @@ and messages undecryptable — restore the most recent state, or re-link the dev
 
 ## Related Projects
 
+- [Kubernetes](https://kubernetes.io/) provides the workload resources rendered by this chart.
 - [bbernhard/signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api)
 - [CasCap.Api.SignalCli](https://github.com/f2calv/CasCap.Api.SignalCli) provides typed .NET clients
   for the REST and JSON-RPC APIs.
