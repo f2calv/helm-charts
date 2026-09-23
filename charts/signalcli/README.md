@@ -7,6 +7,13 @@ The upstream project ships no Helm chart. This one supplies the parts that are e
 a volume for account state, probes that match what the image actually exposes, resources sized for
 a JVM, and schema validation of the environment variables that change its behaviour.
 
+## Related Projects
+
+- [CasCap.Api.SignalCli](https://github.com/f2calv/CasCap.Api.SignalCli) provides typed .NET clients
+  for the REST and JSON-RPC APIs.
+- [signalizr](https://github.com/f2calv/signalizr) provides a controlled Signal gateway for
+  applications that should not own an account connection directly.
+
 ## Install
 
 ```bash

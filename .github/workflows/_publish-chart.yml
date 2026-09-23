@@ -35,7 +35,7 @@ jobs:
 
       - name: validate readme versions (${{ inputs.chart }})
         shell: bash
-        run: .scripts/test-chart-readme-version.sh "charts/${{ inputs.chart }}"
+        run: .scripts/test-chart-readme-version.sh "charts/${{ inputs.chart }}" README.md
 
   versioning:
     needs: [metadata]
