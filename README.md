@@ -14,68 +14,6 @@ version and is published as a public OCI package in GitHub Container Registry.
 | [signalcli](charts/signalcli/README.md) | `1.0.0`        | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
 | [workload](charts/workload/README.md)   | `1.0.3`        | `oci://ghcr.io/f2calv/charts/workload`  | Deploys common Kubernetes workload kinds through framework-neutral templates with concise defaults and opt-in operational controls.                                                         |
 
-## Install a Chart
-
-Install the application-specific `signalcli` chart directly from GHCR:
-
-```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.0
-```
-
-See the [signalcli chart documentation](charts/signalcli/README.md) for account registration,
-storage, configuration, and operational guidance.
-
-## Helm Dependency
-
-Reference the chart from an umbrella chart with its published version:
-
-```yaml
-dependencies:
-  - name: workload
-    version: 1.0.3
-    repository: oci://ghcr.io/f2calv/charts
-    alias: api
-```
-
-Resolve the dependency from the umbrella chart directory:
-
-```bash
-helm dependency update
-```
-
-## Argo CD Application
-
-Argo CD can consume the same OCI package directly:
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: example
-  namespace: argocd
-spec:
-  project: default
-  destination:
-    namespace: example
-    server: https://kubernetes.default.svc
-  source:
-    repoURL: ghcr.io/f2calv
-    chart: charts/workload
-    targetRevision: 1.0.3
-    helm:
-      valuesObject:
-        kind: Deployment
-        replicaCount: 1
-        image:
-          repository: ghcr.io/example/example
-          tag: 1.0.3
-          pullPolicy: IfNotPresent
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-```
-
 ## Versioning
 
 The `version` field in each chart's `Chart.yaml` is the source of truth for its

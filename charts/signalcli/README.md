@@ -7,31 +7,71 @@ The upstream project ships no Helm chart. This one supplies the parts that are e
 a volume for account state, probes that match what the image actually exposes, resources sized for
 a JVM, and schema validation of the environment variables that change its behaviour.
 
-## Related Projects
-
-- [CasCap.Api.SignalCli](https://github.com/f2calv/CasCap.Api.SignalCli) provides typed .NET clients
-  for the REST and JSON-RPC APIs.
-- [signalizr](https://github.com/f2calv/signalizr) provides a controlled Signal gateway for
-  applications that should not own an account connection directly.
-
-## Install
-
-```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.0
-```
-
 The chart depends on [`workload`](../workload/README.md), pulled from `oci://ghcr.io/f2calv/charts`.
 Everything under `signalcli` is passed to that subchart, so its keys are the workload chart's keys.
 
-## Registering an account
+## Install
 
-**Deploying the chart is the easy half.** The container is useless until a Signal account is
+### Helm
+
+Install the application-specific `signalcli` chart directly from GHCR:
+
+```bash
+helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.0 \
+  --namespace my-namespace --create-namespace \
+  --set-string signalcli.envVars.MODE=json-rpc \
+  --set-string signalcli.envVars.LOG_LEVEL=info
+```
+
+Upgrade to the latest stable `signalcli` chart published in GHCR:
+
+```bash
+helm upgrade --install signalcli oci://ghcr.io/f2calv/charts/signalcli \
+  --namespace my-namespace --create-namespace \
+  --set-string signalcli.envVars.MODE=json-rpc \
+  --set-string signalcli.envVars.LOG_LEVEL=info
+```
+
+### Argo CD Application
+
+[Argo CD](https://argo-cd.readthedocs.io/) can consume the same OCI package directly:
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: signalcli
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: my-namespace
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: ghcr.io/f2calv
+    chart: charts/signalcli
+    targetRevision: 1.0.0
+    helm:
+      valuesObject:
+        signalcli:
+          envVars:
+            MODE: json-rpc
+            LOG_LEVEL: info
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
+
+## Setup
+
+The container is useless until a Signal account is
 registered or linked to it, and that state must land on the persistent volume.
 
 1. Port-forward the service:
 
    ```bash
-   kubectl port-forward svc/signalcli 8080:80
+    kubectl port-forward --namespace my-namespace svc/signalcli 8080:80
    ```
 
 2. Link as a secondary device to an existing Signal account — the simpler route:
@@ -59,13 +99,18 @@ volume, every restart discards the registration and you start again.
 
 | Value | Default | Notes |
 | --- | --- | --- |
-| `signalcli.image.tag` | `0.100` | Pinned rather than empty — see below |
+| `signalcli.replicaCount` | `1` | Capped at one because one registered device owns one state volume |
+| `signalcli.image.tag` | `0.100` | Pinned because an empty tag falls back to the workload chart's `appVersion` |
 | `signalcli.envVars.MODE` | `json-rpc` | Also decides the receive endpoint's shape |
 | `signalcli.envVars.LOG_LEVEL` | `info` | |
+| `signalcli.startupProbe` | `/v1/about` | Allows the JVM up to five minutes to load account state |
+| `signalcli.readinessProbe` | `/v1/about` | Marks the pod ready when it can serve requests |
+| `signalcli.livenessProbe` | `false` | Avoids restarting a slow or busy JVM and disconnecting clients |
 | `signalcli.persistentVolumeClaims` | 512Mi `ReadWriteOnce` | Set to `[]` for an ephemeral install |
 
 Environment variables keep their upstream names verbatim, so each traces directly back to the
-bbernhard documentation. The map stays **open**: a variable added by a newer image release can be
+[bbernhard documentation](https://github.com/bbernhard/signal-cli-rest-api). The map stays
+**open**: a variable added by a newer image release can be
 set immediately, without waiting for a chart release. Every variable the image documents is
 validated, so a bad value fails the install rather than the pod:
 
@@ -73,11 +118,6 @@ validated, so a bad value fails the install rather than the pod:
 Error: values don't meet the specifications of the schema(s) in the following chart(s):
 - at '/signalcli/envVars/MODE': value must be one of 'normal', 'native', 'json-rpc', 'json-rpc-native'
 ```
-
-`values.schema.json` is generated from the `# @schema` annotations in `values.yaml` by
-[helm-schema](https://github.com/dadav/helm-schema), which runs as a pre-commit hook. Edit the
-annotations and regenerate; never edit the schema by hand, because the hook will overwrite it and
-fail the `lint` check.
 
 ### Validated environment variables
 
@@ -114,19 +154,7 @@ Three of these are not independent, and the schema cannot enforce that for you:
   anything reads messages through the API. `receive` drains the queue from the Signal server, so
   whichever caller arrives second gets nothing.
 
-### MODE changes the receive contract
-
-`json-rpc` and `json-rpc-native` make `/v1/receive/{number}` a **WebSocket**. The other modes leave
-it a plain `GET`. A consumer written against one will not work against the other, so choose
-deliberately rather than by performance alone.
-
-### Why the image tag is pinned
-
-The workload subchart falls back to *its own* `appVersion` when `image.tag` is empty, which would
-resolve to the workload chart's version and pull an image that does not exist. Keep
-`signalcli.image.tag` in step with this chart's `appVersion`.
-
-## Storage
+## Persistence
 
 Account state is small and grows slowly. A volume carrying a linked account for five months held:
 
@@ -147,7 +175,18 @@ that grows without bound — set `JSON_RPC_IGNORE_STICKERS: true` if that matter
 `storageClassName` is left unset so a clean install works anywhere, which means the cluster default
 is used. **Set it explicitly for anything you intend to keep.** A cluster can carry more than one
 default StorageClass, in which case the most recently created one wins, and you can silently land
-on a class that is neither replicated nor expandable:
+on a class that is neither replicated nor expandable. Set it through an Argo CD `valuesObject`:
+
+```bash
+helm upgrade --install signalcli oci://ghcr.io/f2calv/charts/signalcli \
+  --namespace my-namespace --create-namespace \
+  --set-string 'signalcli.persistentVolumeClaims[0].name=signalcli-pvc' \
+  --set-string 'signalcli.persistentVolumeClaims[0].accessModes[0]=ReadWriteOnce' \
+  --set-string 'signalcli.persistentVolumeClaims[0].storage=512Mi' \
+  --set-string 'signalcli.persistentVolumeClaims[0].storageClassName=longhorn'
+```
+
+Or set the same values via Argo CD manifest:
 
 ```yaml
 signalcli:
@@ -171,6 +210,16 @@ account after every restart. There is no `persistence.enabled` toggle, because t
 are consumed by a subchart and Helm resolves subchart values before templating, so the chart cannot
 conditionally remove them. Clear all three lists instead:
 
+```bash
+helm upgrade --install signalcli oci://ghcr.io/f2calv/charts/signalcli \
+  --namespace my-namespace --create-namespace \
+  --set-json 'signalcli.volumes=[]' \
+  --set-json 'signalcli.volumeMounts=[]' \
+  --set-json 'signalcli.persistentVolumeClaims=[]'
+```
+
+Or set the same values via an Argo CD manifest:
+
 ```yaml
 signalcli:
   volumes: []
@@ -185,8 +234,8 @@ message database is a live SQLite file and copying it from under a running JVM c
 write.
 
 ```bash
-kubectl scale deployment/signalcli --replicas=0
-kubectl cp <namespace>/<helper-pod>:/home/.local/share/signal-cli ./signal-cli-backup
+kubectl scale --namespace my-namespace deployment/signalcli --replicas=0
+kubectl cp --namespace my-namespace <helper-pod>:/home/.local/share/signal-cli ./signal-cli-backup
 ```
 
 The account JSON holds the device's private keys. Treat the copy as a credential: it is enough to
@@ -194,20 +243,10 @@ impersonate the linked device. Note also that Signal's double ratchet advances w
 so restoring a *stale* copy over an account that has kept running leaves the session desynchronised
 and messages undecryptable — restore the most recent state, or re-link the device instead.
 
-## Deliberate defaults
+## Related Projects
 
-- **`replicaCount` is capped at 1 by the schema.** signal-cli registers one device against one
-  account and keeps state on one volume. More than one replica is invalid, not merely unwise.
-- **No liveness probe.** A JVM that is slow or busy is not a JVM that should be killed, and a
-  restart drops the registered session and forces every consumer to reconnect.
-- **Readiness on `/v1/about`**, which answers only once the JVM has loaded account state — the
-  moment it can actually serve traffic. The image exposes no `/healthz`.
-
-## Receiving messages
-
-The wrapper broadcasts each inbound message to every connected receive socket over an unbuffered
-channel with a non-blocking send. A consumer that is not parked inside a receive at that instant
-**misses the message**, with no retry and no error — only a debug line in the wrapper's log.
-
-If more than one process needs inbound messages, have a single owner drain the stream into a
-buffered queue and fan out from there, rather than each consumer holding its own socket.
+- [bbernhard/signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api)
+- [CasCap.Api.SignalCli](https://github.com/f2calv/CasCap.Api.SignalCli) provides typed .NET clients
+  for the REST and JSON-RPC APIs.
+- [signalizr](https://github.com/f2calv/signalizr) provides a controlled Signal gateway for
+  applications that should not own an account connection directly.
