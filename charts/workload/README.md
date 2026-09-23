@@ -20,7 +20,7 @@ owns the reusable Kubernetes resource structure.
 Install the `workload` chart directly from GHCR:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.0.3 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.1.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \
@@ -55,7 +55,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/workload
-    targetRevision: 1.0.3
+    targetRevision: 1.1.0
     helm:
       valuesObject:
         replicaCount: 1
@@ -81,12 +81,13 @@ Set `kind` to one of the supported primary workload modes:
 | [`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)   | Deployment                       | Runs scalable, interchangeable pods with rolling updates. |
 | [`DaemonSet`](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)     | DaemonSet                        | Runs one pod on every eligible node.                      |
 | [`StatefulSet`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) | StatefulSet                      | Runs ordered pods with stable identities and storage.     |
+| [`Job`](https://kubernetes.io/docs/concepts/workloads/controllers/job/)                 | Job                              | Runs a one-shot task to completion.                       |
 | [`ScaledObject`](https://keda.sh/docs/latest/concepts/scaling-deployments/)             | Deployment and KEDA ScaledObject | Adds event-driven autoscaling to a Deployment.            |
 | [`CronJob`](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)       | CronJob                          | Runs a workload on a repeating schedule.                  |
 | [`ScaledJob`](https://keda.sh/docs/latest/concepts/scaling-jobs/)                       | KEDA ScaledJob                   | Creates event-driven Jobs that scale with queue demand.   |
 
-Set `job.enabled: true` to render an additional one-shot Job with the same
-image, environment, volumes, and scheduling configuration.
+Set `kind: Job` to render a one-shot Job using the shared image, environment,
+volumes, resources, and scheduling configuration.
 
 ### Persistence
 
@@ -237,16 +238,9 @@ envVars: {}
 envSecrets: {}
 envVarsFrom: []
 
-# Optional one-shot job.
+# Job resource settings used when kind is Job.
 job:
-  enabled: false
-  nameSuffix: job
   annotations: {}
-  command: []
-  args: []
-  env: {}
-  resources: {}
-  restartPolicy: Never
   ttlSecondsAfterFinished: 360
   backoffLimit: 1
 

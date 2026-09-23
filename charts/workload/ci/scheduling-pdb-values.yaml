@@ -37,10 +37,3 @@ podDisruptionBudget:
   enabled: true
   minAvailable: 1
   unhealthyPodEvictionPolicy: IfHealthyBudget
-job:
-  enabled: true
-  command:
-    - sh
-    - -c
-  args:
-    - echo scheduled
