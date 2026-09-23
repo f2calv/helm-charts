@@ -3,8 +3,6 @@
 Deploy common Kubernetes workload kinds through one framework-neutral chart with sensible
 defaults.
 
-## Overview
-
 `workload` is a universal, framework-neutral Helm chart for deploying one
 containerised workload without maintaining a large application-specific chart.
 Sensible defaults keep common deployments concise, while explicit values expose
@@ -17,110 +15,105 @@ owns the reusable Kubernetes resource structure.
 
 ## Install
 
+### Helm
+
+Install the `workload` chart directly from GHCR:
+
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.0.3
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.1.0 \
+  --namespace my-namespace --create-namespace \
+  --set replicaCount=1 \
+  --set-string image.repository=nginx \
+  --set-string image.tag=1.27-alpine
 ```
 
-To depend on it from another chart:
+Upgrade to the latest stable `workload` chart published in GHCR:
+
+```bash
+helm upgrade --install my-app oci://ghcr.io/f2calv/charts/workload \
+  --namespace my-namespace --create-namespace \
+  --set replicaCount=1 \
+  --set-string image.repository=nginx \
+  --set-string image.tag=1.27-alpine
+```
+
+### Argo CD Application
+
+[Argo CD](https://argo-cd.readthedocs.io/) can consume the same OCI package directly:
 
 ```yaml
-dependencies:
-  - name: workload
-    version: 1.0.3
-    repository: oci://ghcr.io/f2calv/charts
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: my-namespace
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: ghcr.io/f2calv
+    chart: charts/workload
+    targetRevision: 1.1.0
+    helm:
+      valuesObject:
+        replicaCount: 1
+        image:
+          repository: nginx
+          tag: 1.27-alpine
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
 ```
 
-CI checks that every version shown here matches `Chart.yaml`, so these examples cannot go stale.
+## Configuration
 
-## Workload Kinds
+### Workload Kinds
 
 Set `kind` to one of the supported primary workload modes:
 
-| Value         | Resources rendered                      |
-|---------------|-----------------------------------------|
-| `Deployment`  | Deployment                              |
-| `DaemonSet`   | DaemonSet                               |
-| `StatefulSet` | StatefulSet                             |
-| `ScaledObject`| Deployment and KEDA ScaledObject        |
-| `CronJob`     | CronJob                                 |
-| `ScaledJob`   | KEDA ScaledJob                          |
+`Deployment` is the default.
 
-Set `job.enabled: true` to render an additional one-shot Job with the same
-image, environment, volumes, and scheduling configuration.
+| Value                                                                                   | Resources rendered               | Description                                               |
+| --------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------- |
+| [`Deployment`](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)   | Deployment                       | Runs scalable, interchangeable pods with rolling updates. |
+| [`DaemonSet`](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)     | DaemonSet                        | Runs one pod on every eligible node.                      |
+| [`StatefulSet`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) | StatefulSet                      | Runs ordered pods with stable identities and storage.     |
+| [`Job`](https://kubernetes.io/docs/concepts/workloads/controllers/job/)                 | Job                              | Runs a one-shot task to completion.                       |
+| [`ScaledObject`](https://keda.sh/docs/latest/concepts/scaling-deployments/)             | Deployment and KEDA ScaledObject | Adds event-driven autoscaling to a Deployment.            |
+| [`CronJob`](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)       | CronJob                          | Runs a workload on a repeating schedule.                  |
+| [`ScaledJob`](https://keda.sh/docs/latest/concepts/scaling-jobs/)                       | KEDA ScaledJob                   | Creates event-driven Jobs that scale with queue demand.   |
 
-## Pod Scheduling
+Set `kind: Job` to render a one-shot Job using the shared image, environment,
+volumes, resources, and scheduling configuration.
 
-Every pod-producing template supports the same Kubernetes scheduling fields:
-
-* `nodeSelector`
-* `tolerations`
-* `affinity`
-* `topologySpreadConstraints`
-
-Empty defaults omit these fields. The following example constrains operating
-system placement and spreads matching pods across nodes:
-
-```yaml
-nodeSelector:
-  kubernetes.io/os: linux
-tolerations:
-  - key: dedicated
-    operator: Equal
-    value: workloads
-    effect: NoSchedule
-affinity:
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/arch
-              operator: In
-              values: [amd64, arm64]
-topologySpreadConstraints:
-  - maxSkew: 1
-    topologyKey: kubernetes.io/hostname
-    whenUnsatisfiable: DoNotSchedule
-    labelSelector:
-      matchLabels:
-        app.kubernetes.io/name: workload
-```
-
-## Pod Disruption Budgets
-
-PodDisruptionBudget support is opt-in for `Deployment`, `DaemonSet`,
-`StatefulSet`, and `ScaledObject`. Enabling it for `CronJob` or `ScaledJob`, or
-with `replicaCount: 0`, fails template rendering.
-
-Exactly one availability setting must be configured. The conservative default
-uses `minAvailable: 1`:
-
-```yaml
-replicaCount: 2
-podDisruptionBudget:
-  enabled: true
-  minAvailable: 1
-  unhealthyPodEvictionPolicy: IfHealthyBudget
-```
-
-To use `maxUnavailable`, clear the default `minAvailable` value explicitly:
-
-```yaml
-replicaCount: 3
-podDisruptionBudget:
-  enabled: true
-  minAvailable: null
-  maxUnavailable: 25%
-  unhealthyPodEvictionPolicy: AlwaysAllow
-```
-
-Availability values accept non-negative integers or percentages from `0%` to
-`100%`. `unhealthyPodEvictionPolicy` may be `IfHealthyBudget` or `AlwaysAllow`.
-
-## Persistent Volume Claims
+### Persistence
 
 Declare PVCs alongside their consuming workload through `persistentVolumeClaims`.
 Each claim requires a name, one or more Kubernetes access modes, and a storage
 capacity. `storageClassName` is optional so clusters can use their default class.
+
+Set the values through the Helm CLI:
+
+```bash
+helm upgrade --install my-app oci://ghcr.io/f2calv/charts/workload \
+  --namespace my-namespace --create-namespace \
+  --set replicaCount=1 \
+  --set-string image.repository=nginx \
+  --set-string image.tag=1.27-alpine \
+  --set-string 'persistentVolumeClaims[0].name=model-cache' \
+  --set-string 'persistentVolumeClaims[0].storageClassName=local-path' \
+  --set-string 'persistentVolumeClaims[0].accessModes[0]=ReadWriteOnce' \
+  --set-string 'persistentVolumeClaims[0].storage=50Gi' \
+  --set-string 'volumes[0].name=models' \
+  --set-string 'volumes[0].persistentVolumeClaim.claimName=model-cache' \
+  --set-string 'volumeMounts[0].name=models' \
+  --set-string 'volumeMounts[0].mountPath=/models'
+```
+
+Or set the same values via an Argo CD `valuesObject`:
 
 ```yaml
 persistentVolumeClaims:
@@ -141,3 +134,134 @@ volumeMounts:
 When migrating an existing claim from another GitOps owner, protect the live
 resource from pruning and reconcile that protection before transferring the
 declaration. Verify the claim UID and bound PV remain unchanged after adoption.
+
+### Default Values
+
+```yaml
+# Workload mode and replica behavior.
+replicaCount: 0
+kind: Deployment
+namespaceOverride: ""
+serviceName: ""
+revisionHistoryLimit: 3
+strategy: {}
+updateStrategy: {}
+volumeClaimTemplates: []
+cronJobSchedule: ""
+cronJobConcurrencyPolicy: Replace
+
+# Pod execution settings.
+restartPolicy: ""
+runtimeClassName: ""
+hostNetwork: false
+dnsPolicy: ""
+terminationGracePeriodSeconds: null
+
+# Container image and process.
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+  tag: ""
+imagePullSecrets: []
+command: []
+args: []
+
+# Resource naming and pod identity.
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: false
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+
+# Service and ingress networking.
+service:
+  enabled: true
+  name: http
+  type: ClusterIP
+  port: 80
+  containerPort: 80
+  protocol: TCP
+  annotations: {}
+extraPorts: []
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  servicePort: ""
+  hosts:
+    - host: example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+extraIngresses: []
+
+# Resources, probes, and lifecycle.
+resources: {}
+startupProbe: false
+readinessProbe: false
+livenessProbe: false
+lifecycle: {}
+
+# Autoscaling and additional containers.
+autoscaling:
+  enabled: false
+initContainers: []
+extraContainers: []
+
+# Storage and pod scheduling.
+volumes: []
+volumeMounts: []
+persistentVolumeClaims: []
+configMaps: []
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []
+
+# Pod disruption budget.
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  maxUnavailable: null
+  unhealthyPodEvictionPolicy: ""
+
+# Container environment.
+envFieldRef: {}
+envVars: {}
+envSecrets: {}
+envVarsFrom: []
+
+# Job resource settings used when kind is Job.
+job:
+  annotations: {}
+  ttlSecondsAfterFinished: 360
+  backoffLimit: 1
+
+# KEDA settings for ScaledObject and ScaledJob workloads.
+keda:
+  pollingInterval: 10
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 2
+  databaseIndex: ""
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  rolloutStrategy: gradual
+  jobTargetRef:
+    activeDeadlineSeconds: 600
+    backoffLimit: 6
+  triggers: []
+  triggerAuthentications: []
+```
+
+## Related Projects
+
+- [Kubernetes](https://kubernetes.io/) provides the workload resources rendered by this chart.
+- [KEDA](https://keda.sh/) provides the `ScaledObject` and `ScaledJob` autoscaling resources.

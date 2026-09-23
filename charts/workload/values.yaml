@@ -11,7 +11,7 @@
 replicaCount: 0
 
 # @schema
-# enum: [Deployment, DaemonSet, StatefulSet, ScaledObject, ScaledJob, CronJob]
+# enum: [Deployment, DaemonSet, StatefulSet, Job, ScaledObject, ScaledJob, CronJob]
 # @schema
 # Workload kind that determines the primary resource rendered.
 kind: Deployment
@@ -250,20 +250,12 @@ envSecrets: {}
 # Sources passed directly to the container envFrom list.
 envVarsFrom: []
 
-# Optional one-shot batch Job that uses the same image and shared pod settings.
+# @schema
+# additionalProperties: false
+# @schema
+# Job resource settings used when kind is Job.
 job:
-  enabled: false
-  nameSuffix: job
   annotations: {}
-  command: []
-  args: []
-  # @schema
-  # additionalProperties:
-  #   type: [string, number, boolean]
-  # @schema
-  env: {}
-  resources: {}
-  restartPolicy: Never
   # @schema
   # minimum: 0
   # @schema

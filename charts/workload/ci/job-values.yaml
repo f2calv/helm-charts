@@ -1,0 +1,14 @@
+kind: Job
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+command:
+  - sh
+  - -c
+args:
+  - echo completed
+job:
+  annotations:
+    example.com/purpose: validation
+  ttlSecondsAfterFinished: 360
+  backoffLimit: 1

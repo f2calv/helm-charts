@@ -274,63 +274,19 @@
       "type": "array"
     },
     "job": {
-      "description": "Optional one-shot batch Job that uses the same image and shared pod settings.",
+      "additionalProperties": false,
+      "description": "Job resource settings used when kind is Job.",
       "properties": {
         "annotations": {
           "required": [],
           "title": "annotations",
           "type": "object"
         },
-        "args": {
-          "items": {
-            "required": []
-          },
-          "title": "args",
-          "type": "array"
-        },
         "backoffLimit": {
           "default": "1",
           "minimum": 0,
           "required": [],
           "title": "backoffLimit"
-        },
-        "command": {
-          "items": {
-            "required": []
-          },
-          "title": "command",
-          "type": "array"
-        },
-        "enabled": {
-          "default": false,
-          "title": "enabled",
-          "type": "boolean"
-        },
-        "env": {
-          "additionalProperties": {
-            "type": [
-              "string",
-              "number",
-              "boolean"
-            ]
-          },
-          "required": [],
-          "title": "env"
-        },
-        "nameSuffix": {
-          "default": "job",
-          "title": "nameSuffix",
-          "type": "string"
-        },
-        "resources": {
-          "required": [],
-          "title": "resources",
-          "type": "object"
-        },
-        "restartPolicy": {
-          "default": "Never",
-          "title": "restartPolicy",
-          "type": "string"
         },
         "ttlSecondsAfterFinished": {
           "default": "360",
@@ -340,8 +296,7 @@
         }
       },
       "required": [],
-      "title": "job",
-      "type": "object"
+      "title": "job"
     },
     "keda": {
       "description": "KEDA settings used by ScaledObject and ScaledJob workloads.",
@@ -446,6 +401,7 @@
         "Deployment",
         "DaemonSet",
         "StatefulSet",
+        "Job",
         "ScaledObject",
         "ScaledJob",
         "CronJob"

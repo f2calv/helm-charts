@@ -1,8 +1,8 @@
-{{- if .Values.job.enabled }}
+{{- if eq (default "Deployment" .Values.kind) "Job" }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "workload.fullname" . }}-{{ .Values.job.nameSuffix }}
+  name: {{ include "workload.fullname" . }}
   namespace: {{ include "workload.namespace" $ }}
   labels:
     {{- include "workload.labels" . | nindent 4 }}
@@ -25,7 +25,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      restartPolicy: {{ .Values.job.restartPolicy }}
+      restartPolicy: {{ default "Never" .Values.restartPolicy }}
       {{- with .Values.runtimeClassName }}
       runtimeClassName: {{ . }}
       {{- end }}
@@ -45,18 +45,18 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}-{{ .Values.job.nameSuffix }}
+        - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.job.command }}
+          {{- with .Values.command }}
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.job.args }}
+          {{- with .Values.args }}
           args:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -71,10 +71,6 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
-            {{- range $key, $value := .Values.job.env }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
             {{- range $key, $secret := .Values.envSecrets }}
             - name: {{ $key }}
               valueFrom:
@@ -86,7 +82,7 @@ spec:
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with (.Values.job.resources | default .Values.resources) }}
+          {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}

@@ -35,7 +35,7 @@ jobs:
 
       - name: validate readme versions (${{ inputs.chart }})
         shell: bash
-        run: .scripts/test-chart-readme-version.sh "charts/${{ inputs.chart }}"
+        run: .scripts/test-chart-readme-version.sh "charts/${{ inputs.chart }}" README.md
 
   versioning:
     needs: [metadata]
@@ -51,7 +51,6 @@ jobs:
 
   package:
     needs: [metadata, versioning]
-    if: needs.versioning.outputs['release-exists'] == 'false'
     permissions:
       contents: read
       packages: write
@@ -64,21 +63,16 @@ jobs:
       chart-registry-username: ${{ github.repository_owner }}
       chart-repository: ${{ github.repository_owner }}/charts/${{ inputs.chart }}
       chart-path: charts/${{ inputs.chart }}
-      is-library-chart: true
-      push-chart: ${{ github.ref_name == github.event.repository.default_branch }}
-      chart-testing-cli-command: skip
+      is-library-chart: false
+      set-chart-app-version: false
+      has-image: false
+      push-chart: ${{ needs.versioning.outputs['release-exists'] == 'false'
+        && github.ref_name == github.event.repository.default_branch }}
+      chart-testing-cli-command: lint
     secrets: inherit
 
-  chart:
-    needs: [package]
-    runs-on: ubuntu-latest
-    permissions: {}
-    steps:
-      - name: helm chart package passed
-        run: 'true'
-
   release:
-    needs: [metadata, versioning, chart]
+    needs: [metadata, versioning, package]
     if: needs.versioning.outputs['release-exists'] == 'false'
       && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     permissions:
