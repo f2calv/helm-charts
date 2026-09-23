@@ -63,7 +63,8 @@ jobs:
       chart-registry-username: ${{ github.repository_owner }}
       chart-repository: ${{ github.repository_owner }}/charts/${{ inputs.chart }}
       chart-path: charts/${{ inputs.chart }}
-      is-library-chart: true
+      is-library-chart: false
+      set-chart-app-version: false
       has-image: false
       push-chart: ${{ needs.versioning.outputs['release-exists'] == 'false'
         && github.ref_name == github.event.repository.default_branch }}
