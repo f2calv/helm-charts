@@ -401,6 +401,19 @@
           "title": "startupProbe",
           "type": "object"
         },
+        "strategy": {
+          "description": "signal-cli locks the account on its volume, so a rolling update starts the new pod while the old\none still holds the lock and the new daemon never comes up. Stop the old pod first.",
+          "properties": {
+            "type": {
+              "default": "Recreate",
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "strategy",
+          "type": "object"
+        },
         "volumeMounts": {
           "items": {
             "anyOf": [
