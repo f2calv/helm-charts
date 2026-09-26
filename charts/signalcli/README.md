@@ -17,7 +17,7 @@ Everything under `signalcli` is passed to that subchart, so its keys are the wor
 Install the application-specific `signalcli` chart directly from GHCR:
 
 ```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.0 \
+helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.1 \
   --namespace my-namespace --create-namespace \
   --set-string signalcli.envVars.MODE=json-rpc \
   --set-string signalcli.envVars.LOG_LEVEL=info
@@ -50,7 +50,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/signalcli
-    targetRevision: 1.0.0
+    targetRevision: 1.0.1
     helm:
       valuesObject:
         signalcli:
@@ -100,6 +100,7 @@ volume, every restart discards the registration and you start again.
 | Value | Default | Notes |
 | --- | --- | --- |
 | `signalcli.replicaCount` | `1` | Capped at one because one registered device owns one state volume |
+| `signalcli.strategy.type` | `Recreate` | The old pod releases the account lock before the new one starts |
 | `signalcli.image.tag` | `0.100` | Pinned because an empty tag falls back to the workload chart's `appVersion` |
 | `signalcli.envVars.MODE` | `json-rpc` | Also decides the receive endpoint's shape |
 | `signalcli.envVars.LOG_LEVEL` | `info` | |
@@ -161,6 +162,8 @@ signalcli:
   # Resource naming and workload size.
   fullnameOverride: signalcli
   replicaCount: 1
+  strategy:
+    type: Recreate
 
   # Container image and service.
   image:

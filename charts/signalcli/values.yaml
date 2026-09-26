@@ -16,6 +16,11 @@ signalcli:
   # wrapper cannot be scaled out.
   replicaCount: 1
 
+  # signal-cli locks the account on its volume, so a rolling update starts the new pod while the old
+  # one still holds the lock and the new daemon never comes up. Stop the old pod first.
+  strategy:
+    type: Recreate
+
   image:
     repository: bbernhard/signal-cli-rest-api
     pullPolicy: IfNotPresent
