@@ -17,7 +17,7 @@ Everything under `signalcli` is passed to that subchart, so its keys are the wor
 Install the application-specific `signalcli` chart directly from GHCR:
 
 ```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.1 \
+helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.2 \
   --namespace my-namespace --create-namespace \
   --set-string signalcli.envVars.MODE=json-rpc \
   --set-string signalcli.envVars.LOG_LEVEL=info
@@ -50,7 +50,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/signalcli
-    targetRevision: 1.0.1
+    targetRevision: 1.0.2
     helm:
       valuesObject:
         signalcli:
