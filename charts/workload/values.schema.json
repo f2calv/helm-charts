@@ -187,6 +187,27 @@
           "title": "className",
           "type": "string"
         },
+        "computedAnnotations": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "properties": {
+              "valueFrom": {
+                "enum": [
+                  "serviceName"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "valueFrom"
+            ],
+            "type": "object"
+          },
+          "description": "Annotation values derived from rendered resources. This avoids reconstructing\nrelease-prefixed names in consuming values.",
+          "required": [],
+          "title": "computedAnnotations",
+          "type": "object"
+        },
         "enabled": {
           "default": false,
           "title": "enabled",

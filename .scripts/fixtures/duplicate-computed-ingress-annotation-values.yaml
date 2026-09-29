@@ -1,0 +1,16 @@
+replicaCount: 1
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+ingress:
+  enabled: true
+  annotations:
+    example.com/backend-service: fixed-name
+  computedAnnotations:
+    example.com/backend-service:
+      valueFrom: serviceName
+  hosts:
+    - host: duplicate.example.com
+      paths:
+        - path: /
+          pathType: Prefix

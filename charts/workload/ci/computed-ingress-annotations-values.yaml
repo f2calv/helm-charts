@@ -1,0 +1,42 @@
+replicaCount: 1
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+command:
+  - sh
+  - -c
+args:
+  - sleep 3600
+extraPorts:
+  - name: grpc
+    port: 5001
+    containerPort: 5001
+ingress:
+  enabled: true
+  className: nginx-f5
+  annotations:
+    nginx.org/mergeable-ingress-type: minion
+  computedAnnotations:
+    nginx.org/grpc-services:
+      valueFrom: serviceName
+  servicePort: 5001
+  hosts:
+    - host: grpc.example.com
+      paths:
+        - path: /example.Service
+          pathType: ImplementationSpecific
+extraIngresses:
+  - nameSuffix: streaming
+    enabled: true
+    className: nginx-f5
+    annotations:
+      nginx.org/mergeable-ingress-type: minion
+    computedAnnotations:
+      example.com/backend-service:
+        valueFrom: serviceName
+    servicePort: 5001
+    hosts:
+      - host: grpc.example.com
+        paths:
+          - path: /example.Streaming
+            pathType: ImplementationSpecific

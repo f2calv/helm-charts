@@ -60,9 +60,20 @@ repos:
   rev: 0.23.5
   hooks:
   - id: helm-schema
+    name: Generate workload jsonschema
     args:
-    - --chart-search-root=charts
+    - --chart-search-root=charts/workload
     - --no-dependencies
     - --append-newline
     - --skip-auto-generation=required
     - --skip-auto-generation=additionalProperties
+    files: ^charts/workload/values\.yaml$
+  - id: helm-schema
+    name: Generate signalcli jsonschema
+    args:
+    - --chart-search-root=charts/signalcli
+    - --no-dependencies
+    - --append-newline
+    - --skip-auto-generation=required
+    - --skip-auto-generation=additionalProperties
+    files: ^charts/signalcli/values\.yaml$

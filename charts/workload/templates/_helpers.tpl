@@ -75,6 +75,18 @@ livenessProbe:
 {{- $name := .name -}}
 {{- $serviceName := .serviceName -}}
 {{- $servicePort := $spec.servicePort | default $root.Values.service.port -}}
+{{- $annotations := deepCopy ($spec.annotations | default dict) -}}
+{{- range $annotationName, $computed := ($spec.computedAnnotations | default dict) -}}
+{{- if hasKey $annotations $annotationName -}}
+{{- fail (printf "ingress annotation %q cannot be set in both annotations and computedAnnotations" $annotationName) -}}
+{{- end -}}
+{{- $valueFrom := required (printf "computedAnnotations[%q].valueFrom is required" $annotationName) $computed.valueFrom -}}
+{{- if eq $valueFrom "serviceName" -}}
+{{- $_ := set $annotations $annotationName $serviceName -}}
+{{- else -}}
+{{- fail (printf "computedAnnotations[%q].valueFrom %q is unsupported" $annotationName $valueFrom) -}}
+{{- end -}}
+{{- end -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -82,7 +94,7 @@ metadata:
   namespace: {{ include "workload.namespace" $root }}
   labels:
     {{- include "workload.labels" $root | nindent 4 }}
-  {{- with $spec.annotations }}
+  {{- with $annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
