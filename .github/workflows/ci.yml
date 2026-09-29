@@ -19,9 +19,19 @@ jobs:
       contents: read
     uses: f2calv/gha-workflows/.github/workflows/lint.yml@v1
 
+  workload-tests:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: test-workload-computed-annotations.sh
+        run: .scripts/test-workload-computed-annotations.sh
+
   release:
     name: release (${{ matrix.chart }})
-    needs: [lint]
+    needs: [lint, workload-tests]
     strategy:
       fail-fast: false
       matrix:

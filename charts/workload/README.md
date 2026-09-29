@@ -20,7 +20,7 @@ owns the reusable Kubernetes resource structure.
 Install the `workload` chart directly from GHCR:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.1.0 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.2.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \
@@ -55,7 +55,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/workload
-    targetRevision: 1.1.0
+    targetRevision: 1.2.0
     helm:
       valuesObject:
         replicaCount: 1
@@ -88,6 +88,36 @@ Set `kind` to one of the supported primary workload modes:
 
 Set `kind: Job` to render a one-shot Job using the shared image, environment,
 volumes, resources, and scheduling configuration.
+
+### Computed Ingress Annotations
+
+Use `computedAnnotations` when an ingress controller annotation must reference the
+Service name rendered by this chart. The chart resolves the value after applying
+the release name, dependency alias, `nameOverride`, and `fullnameOverride`.
+
+```yaml
+ingress:
+  enabled: true
+  className: nginx-f5
+  annotations:
+    nginx.org/mergeable-ingress-type: minion
+  computedAnnotations:
+    nginx.org/grpc-services:
+      valueFrom: serviceName
+  servicePort: 5001
+  hosts:
+    - host: grpc.example.com
+      paths:
+        - path: /example.Service
+          pathType: ImplementationSpecific
+```
+
+This renders `nginx.org/grpc-services` with the exact Service name used by the
+Ingress backend. The same contract applies to entries under `extraIngresses`.
+An annotation key cannot appear in both `annotations` and
+`computedAnnotations`; conflicting configuration fails rendering.
+
+Existing consumers are unchanged when `computedAnnotations` is omitted.
 
 ### Persistence
 
@@ -193,6 +223,7 @@ ingress:
   enabled: false
   className: ""
   annotations: {}
+  computedAnnotations: {}
   servicePort: ""
   hosts:
     - host: example.local

@@ -114,6 +114,20 @@ ingress:
   className: ""
   annotations: {}
   # @schema
+  # type: object
+  # additionalProperties:
+  #   type: object
+  #   additionalProperties: false
+  #   required: [valueFrom]
+  #   properties:
+  #     valueFrom:
+  #       type: string
+  #       enum: [serviceName]
+  # @schema
+  # Annotation values derived from rendered resources. This avoids reconstructing
+  # release-prefixed names in consuming values.
+  computedAnnotations: {}
+  # @schema
   # oneOf:
   #   - type: integer
   #     minimum: 1
