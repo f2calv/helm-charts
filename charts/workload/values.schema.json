@@ -530,14 +530,23 @@
           "title": "backoffLimit"
         },
         "ttlSecondsAfterFinished": {
-          "default": 360,
-          "minimum": 0,
+          "default": "360",
+          "description": "Set to an empty string to omit the field through valuesObject-based GitOps renderers.",
+          "oneOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "const": "",
+              "required": []
+            },
+            {
+              "type": "null"
+            }
+          ],
           "required": [],
-          "title": "ttlSecondsAfterFinished",
-          "type": [
-            "integer",
-            "null"
-          ]
+          "title": "ttlSecondsAfterFinished"
         }
       },
       "required": [],

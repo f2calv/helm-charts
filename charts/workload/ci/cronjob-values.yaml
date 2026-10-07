@@ -4,7 +4,7 @@ cronJobStartingDeadlineSeconds: 60
 cronJobSuccessfulJobsHistoryLimit: 3
 cronJobFailedJobsHistoryLimit: 2
 job:
-  ttlSecondsAfterFinished: null
+  ttlSecondsAfterFinished: ""
   backoffLimit: 2
   activeDeadlineSeconds: 120
 image:
