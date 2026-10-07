@@ -20,7 +20,7 @@ spec:
   {{- end }}
   jobTemplate:
     spec:
-      {{- if not (kindIs "invalid" .Values.job.ttlSecondsAfterFinished) }}
+      {{- if and (not (kindIs "invalid" .Values.job.ttlSecondsAfterFinished)) (ne (toString .Values.job.ttlSecondsAfterFinished) "") }}
       ttlSecondsAfterFinished: {{ .Values.job.ttlSecondsAfterFinished }}
       {{- end }}
       backoffLimit: {{ .Values.job.backoffLimit }}

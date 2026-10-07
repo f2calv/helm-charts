@@ -406,9 +406,13 @@ envVarsFrom: []
 job:
   annotations: {}
   # @schema
-  # type: [integer, "null"]
-  # minimum: 0
+  # oneOf:
+  #   - type: integer
+  #     minimum: 0
+  #   - const: ""
+  #   - type: "null"
   # @schema
+  # Set to an empty string to omit the field through valuesObject-based GitOps renderers.
   ttlSecondsAfterFinished: 360
   # @schema
   # minimum: 0
