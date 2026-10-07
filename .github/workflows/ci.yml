@@ -32,6 +32,9 @@ jobs:
       - name: test-workload-cronjob-controls.sh
         run: .scripts/test-workload-cronjob-controls.sh
 
+      - name: test-workload-environment.sh
+        run: .scripts/test-workload-environment.sh
+
       - name: test-workload-ownership-controls.sh
         run: .scripts/test-workload-ownership-controls.sh
 

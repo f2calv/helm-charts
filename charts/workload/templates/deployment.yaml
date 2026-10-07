@@ -104,28 +104,7 @@ spec:
               protocol: {{ default "TCP" .protocol }}
             {{- end }}
           {{- end }}
-          env:
-            {{- range $name, $fieldPath := .Values.envFieldRef }}
-            - name: {{ $name }}
-              valueFrom:
-                fieldRef:
-                  fieldPath: {{ $fieldPath }}
-            {{- end }}
-            {{- range $key, $value := .Values.envVars }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
-            {{- range $key, $secret := .Values.envSecrets }}
-            - name: {{ $key }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secret }}
-                  key: {{ $key | quote }}
-            {{- end }}
-          {{- with .Values.envVarsFrom }}
-          envFrom:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+          {{- include "workload.environment" . | trim | nindent 10 }}
           {{- include "workload.probes" . | trim | nindent 10 }}
           {{- with .Values.resources }}
           resources:

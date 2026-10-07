@@ -119,6 +119,35 @@ An annotation key cannot appear in both `annotations` and
 
 Existing consumers are unchanged when `computedAnnotations` is omitted.
 
+### Environment Variables
+
+Use `envVars` for literal scalars, `envVarsValueFrom` for individual Kubernetes
+references, and `envVarsFrom` for complete ConfigMap or Secret imports.
+`envFieldRef` remains a concise downward-API shorthand, while `envSecrets` maps
+an environment variable to a Secret of the same key name.
+
+```yaml
+envVars:
+  LOG_LEVEL: Information
+envVarsValueFrom:
+  DATABASE_PASSWORD:
+    secretKeyRef:
+      name: database
+      key: password
+  NODE_NAME:
+    fieldRef:
+      fieldPath: spec.nodeName
+envVarsFrom:
+  - prefix: SHARED_
+    configMapRef:
+      name: shared-settings
+  - secretRef:
+      name: shared-secrets
+```
+
+Variable names must be unique across `envFieldRef`, `envVars`, `envSecrets`,
+and `envVarsValueFrom`; conflicting declarations fail rendering.
+
 ### Network Policies
 
 Declare workload-owned policies through `networkPolicies`. Each entry requires a
@@ -298,6 +327,7 @@ podDisruptionBudget:
 envFieldRef: {}
 envVars: {}
 envSecrets: {}
+envVarsValueFrom: {}
 envVarsFrom: []
 
 # Job resource settings used when kind is Job.

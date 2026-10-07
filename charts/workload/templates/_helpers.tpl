@@ -71,6 +71,48 @@ livenessProbe:
 {{- end }}
 {{- end -}}
 
+{{/* Render literal, referenced, and bulk-imported container environment variables. */}}
+{{- define "workload.environment" -}}
+{{- $seen := dict -}}
+{{- $entries := list -}}
+{{- range $name, $fieldPath := .Values.envFieldRef -}}
+{{- if hasKey $seen $name -}}
+{{- fail (printf "environment variable %q is configured more than once" $name) -}}
+{{- end -}}
+{{- $_ := set $seen $name true -}}
+{{- $entries = append $entries (dict "name" $name "valueFrom" (dict "fieldRef" (dict "fieldPath" $fieldPath))) -}}
+{{- end -}}
+{{- range $name, $value := .Values.envVars -}}
+{{- if hasKey $seen $name -}}
+{{- fail (printf "environment variable %q is configured more than once" $name) -}}
+{{- end -}}
+{{- $_ := set $seen $name true -}}
+{{- $entries = append $entries (dict "name" $name "value" (printf "%v" $value)) -}}
+{{- end -}}
+{{- range $name, $secret := .Values.envSecrets -}}
+{{- if hasKey $seen $name -}}
+{{- fail (printf "environment variable %q is configured more than once" $name) -}}
+{{- end -}}
+{{- $_ := set $seen $name true -}}
+{{- $entries = append $entries (dict "name" $name "valueFrom" (dict "secretKeyRef" (dict "name" $secret "key" $name))) -}}
+{{- end -}}
+{{- range $name, $source := .Values.envVarsValueFrom -}}
+{{- if hasKey $seen $name -}}
+{{- fail (printf "environment variable %q is configured more than once" $name) -}}
+{{- end -}}
+{{- $_ := set $seen $name true -}}
+{{- $entries = append $entries (dict "name" $name "valueFrom" $source) -}}
+{{- end -}}
+{{- with $entries }}
+env:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.envVarsFrom }}
+envFrom:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end -}}
+
 {{/* Render a networking.k8s.io/v1 Ingress. */}}
 {{- define "workload.ingress" -}}
 {{- $root := .root -}}

@@ -140,11 +140,171 @@
     "envVarsFrom": {
       "description": "Sources passed directly to the container envFrom list.",
       "items": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "configMapRef"
+            ]
+          },
+          {
+            "required": [
+              "secretRef"
+            ]
+          }
+        ],
+        "properties": {
+          "configMapRef": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "prefix": {
+            "type": "string"
+          },
+          "secretRef": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
         "required": [],
         "type": "object"
       },
       "title": "envVarsFrom",
       "type": "array"
+    },
+    "envVarsValueFrom": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "configMapKeyRef"
+            ]
+          },
+          {
+            "required": [
+              "fieldRef"
+            ]
+          },
+          {
+            "required": [
+              "resourceFieldRef"
+            ]
+          },
+          {
+            "required": [
+              "secretKeyRef"
+            ]
+          }
+        ],
+        "properties": {
+          "configMapKeyRef": {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "key"
+            ],
+            "type": "object"
+          },
+          "fieldRef": {
+            "additionalProperties": false,
+            "properties": {
+              "apiVersion": {
+                "type": "string"
+              },
+              "fieldPath": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "fieldPath"
+            ],
+            "type": "object"
+          },
+          "resourceFieldRef": {
+            "additionalProperties": false,
+            "properties": {
+              "containerName": {
+                "type": "string"
+              },
+              "divisor": {
+                "type": "string"
+              },
+              "resource": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "resource"
+            ],
+            "type": "object"
+          },
+          "secretKeyRef": {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "key"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "description": "Kubernetes EnvVarSource entries keyed by environment variable name.",
+      "required": [],
+      "title": "envVarsValueFrom"
     },
     "extraContainers": {
       "items": {

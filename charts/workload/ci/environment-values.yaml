@@ -1,0 +1,43 @@
+replicaCount: 1
+containerName: app
+image:
+  repository: busybox
+  pullPolicy: IfNotPresent
+command:
+  - sh
+  - -c
+args:
+  - sleep 3600
+envFieldRef:
+  POD_NAME: metadata.name
+envVars:
+  ENABLED: true
+  LOG_LEVEL: info
+  RETRIES: 3
+envSecrets:
+  API_TOKEN: api-secret
+envVarsValueFrom:
+  CONFIG_VALUE:
+    configMapKeyRef:
+      name: app-config
+      key: setting
+      optional: true
+  CPU_LIMIT:
+    resourceFieldRef:
+      containerName: app
+      resource: limits.cpu
+      divisor: 1m
+  DB_PASSWORD:
+    secretKeyRef:
+      name: database
+      key: password
+  NODE_NAME:
+    fieldRef:
+      fieldPath: spec.nodeName
+envVarsFrom:
+  - prefix: CONFIG_
+    configMapRef:
+      name: shared-config
+  - secretRef:
+      name: shared-secret
+      optional: true

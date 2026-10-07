@@ -303,9 +303,98 @@ envVars: {}
 envSecrets: {}
 
 # @schema
+# additionalProperties:
+#   type: object
+#   additionalProperties: false
+#   oneOf:
+#     - required: [configMapKeyRef]
+#     - required: [fieldRef]
+#     - required: [resourceFieldRef]
+#     - required: [secretKeyRef]
+#   properties:
+#     configMapKeyRef:
+#       type: object
+#       additionalProperties: false
+#       required: [name, key]
+#       properties:
+#         name:
+#           type: string
+#           minLength: 1
+#         key:
+#           type: string
+#           minLength: 1
+#         optional:
+#           type: boolean
+#     fieldRef:
+#       type: object
+#       additionalProperties: false
+#       required: [fieldPath]
+#       properties:
+#         apiVersion:
+#           type: string
+#         fieldPath:
+#           type: string
+#           minLength: 1
+#     resourceFieldRef:
+#       type: object
+#       additionalProperties: false
+#       required: [resource]
+#       properties:
+#         containerName:
+#           type: string
+#         divisor:
+#           type: string
+#         resource:
+#           type: string
+#           minLength: 1
+#     secretKeyRef:
+#       type: object
+#       additionalProperties: false
+#       required: [name, key]
+#       properties:
+#         name:
+#           type: string
+#           minLength: 1
+#         key:
+#           type: string
+#           minLength: 1
+#         optional:
+#           type: boolean
+# @schema
+# Kubernetes EnvVarSource entries keyed by environment variable name.
+envVarsValueFrom: {}
+
+# @schema
 # type: array
 # items:
 #   type: object
+#   additionalProperties: false
+#   oneOf:
+#     - required: [configMapRef]
+#     - required: [secretRef]
+#   properties:
+#     prefix:
+#       type: string
+#     configMapRef:
+#       type: object
+#       additionalProperties: false
+#       required: [name]
+#       properties:
+#         name:
+#           type: string
+#           minLength: 1
+#         optional:
+#           type: boolean
+#     secretRef:
+#       type: object
+#       additionalProperties: false
+#       required: [name]
+#       properties:
+#         name:
+#           type: string
+#           minLength: 1
+#         optional:
+#           type: boolean
 # @schema
 # Sources passed directly to the container envFrom list.
 envVarsFrom: []
