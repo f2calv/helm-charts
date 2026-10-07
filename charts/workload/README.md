@@ -20,7 +20,7 @@ owns the reusable Kubernetes resource structure.
 Install the `workload` chart directly from GHCR:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.3.0 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.4.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \
@@ -55,7 +55,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/workload
-    targetRevision: 1.3.0
+    targetRevision: 1.4.0
     helm:
       valuesObject:
         replicaCount: 1
