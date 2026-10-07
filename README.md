@@ -11,8 +11,8 @@ version and is published as a public OCI package in GitHub Container Registry.
 
 | Chart                                   | Latest version | OCI reference                           | Purpose                                                                                                                                                                                     |
 | --------------------------------------- | -------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [signalcli](charts/signalcli/README.md) | `1.0.3`        | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
-| [workload](charts/workload/README.md)   | `1.3.0`        | `oci://ghcr.io/f2calv/charts/workload`  | Deploys common Kubernetes workload kinds through framework-neutral templates with concise defaults and opt-in operational controls.                                                         |
+| [signalcli](charts/signalcli/README.md) | `1.0.4`        | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
+| [workload](charts/workload/README.md)   | `1.4.0`        | `oci://ghcr.io/f2calv/charts/workload`  | Deploys common Kubernetes workload kinds through framework-neutral templates with concise defaults and opt-in operational controls.                                                         |
 
 ## Versioning
 

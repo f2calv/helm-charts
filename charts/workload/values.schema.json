@@ -508,6 +508,16 @@
       "additionalProperties": false,
       "description": "Job resource settings used when kind is Job.",
       "properties": {
+        "activeDeadlineSeconds": {
+          "default": "null",
+          "minimum": 1,
+          "required": [],
+          "title": "activeDeadlineSeconds",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
         "annotations": {
           "required": [],
           "title": "annotations",
@@ -520,10 +530,14 @@
           "title": "backoffLimit"
         },
         "ttlSecondsAfterFinished": {
-          "default": "360",
+          "default": 360,
           "minimum": 0,
           "required": [],
-          "title": "ttlSecondsAfterFinished"
+          "title": "ttlSecondsAfterFinished",
+          "type": [
+            "integer",
+            "null"
+          ]
         }
       },
       "required": [],

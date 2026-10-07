@@ -335,6 +335,7 @@ job:
   annotations: {}
   ttlSecondsAfterFinished: 360
   backoffLimit: 1
+  activeDeadlineSeconds: null
 
 # KEDA settings for ScaledObject and ScaledJob workloads.
 keda:

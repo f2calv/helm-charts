@@ -406,6 +406,7 @@ envVarsFrom: []
 job:
   annotations: {}
   # @schema
+  # type: [integer, "null"]
   # minimum: 0
   # @schema
   ttlSecondsAfterFinished: 360
@@ -413,6 +414,11 @@ job:
   # minimum: 0
   # @schema
   backoffLimit: 1
+  # @schema
+  # type: [integer, "null"]
+  # minimum: 1
+  # @schema
+  activeDeadlineSeconds: null
 
 # KEDA settings used by ScaledObject and ScaledJob workloads.
 keda:

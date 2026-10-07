@@ -1,6 +1,6 @@
 dependencies:
 - name: workload
   repository: file://../workload
-  version: 1.3.0
-digest: sha256:31e569c8b13fc9c8ac9afea9ac8b64d5c9cd8bdba23c132588fd283a90e1c487
-generated: "2026-10-07T09:06:48.2821492+02:00"
+  version: 1.4.0
+digest: sha256:dfa0d8e8b190c9bd3a9ed002a1565d9ff2ad34e5b156f68a71adc98e7014349a
+generated: "2026-10-07T12:03:02.1950386+02:00"

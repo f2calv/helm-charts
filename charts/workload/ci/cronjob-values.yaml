@@ -3,6 +3,10 @@ cronJobSchedule: "*/5 * * * *"
 cronJobStartingDeadlineSeconds: 60
 cronJobSuccessfulJobsHistoryLimit: 3
 cronJobFailedJobsHistoryLimit: 2
+job:
+  ttlSecondsAfterFinished: null
+  backoffLimit: 2
+  activeDeadlineSeconds: 120
 image:
   repository: busybox
   pullPolicy: IfNotPresent
