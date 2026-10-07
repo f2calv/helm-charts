@@ -20,7 +20,7 @@ owns the reusable Kubernetes resource structure.
 Install the `workload` chart directly from GHCR:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.2.0 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.3.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \
@@ -55,7 +55,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/workload
-    targetRevision: 1.2.0
+    targetRevision: 1.3.0
     helm:
       valuesObject:
         replicaCount: 1
@@ -118,6 +118,30 @@ An annotation key cannot appear in both `annotations` and
 `computedAnnotations`; conflicting configuration fails rendering.
 
 Existing consumers are unchanged when `computedAnnotations` is omitted.
+
+### Network Policies
+
+Declare workload-owned policies through `networkPolicies`. Each entry requires a
+name and a Kubernetes `NetworkPolicySpec`; labels and annotations are optional.
+
+```yaml
+networkPolicies:
+  - name: allow-ingress
+    spec:
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: my-app
+      policyTypes:
+        - Ingress
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: ingress-system
+```
+
+Keep a policy outside the release only when it spans releases or requires an
+independent lifecycle or sync order.
 
 ### Persistence
 
@@ -185,6 +209,7 @@ restartPolicy: ""
 runtimeClassName: ""
 hostNetwork: false
 dnsPolicy: ""
+automountServiceAccountToken: null
 terminationGracePeriodSeconds: null
 
 # Container image and process.
@@ -195,10 +220,12 @@ image:
 imagePullSecrets: []
 command: []
 args: []
+containerName: ""
 
 # Resource naming and pod identity.
 nameOverride: ""
 fullnameOverride: ""
+commonLabels: {}
 serviceAccount:
   create: false
   automount: true
@@ -251,6 +278,7 @@ volumes: []
 volumeMounts: []
 persistentVolumeClaims: []
 configMaps: []
+networkPolicies: []
 nodeSelector: {}
 tolerations: []
 affinity: {}

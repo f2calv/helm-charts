@@ -14,6 +14,16 @@
       "title": "args",
       "type": "array"
     },
+    "automountServiceAccountToken": {
+      "default": "null",
+      "description": "Set false to prevent Kubernetes from mounting a service-account token in workload pods.",
+      "required": [],
+      "title": "automountServiceAccountToken",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
     "autoscaling": {
       "properties": {
         "enabled": {
@@ -34,12 +44,22 @@
       "title": "command",
       "type": "array"
     },
+    "commonLabels": {
+      "required": [],
+      "title": "commonLabels",
+      "type": "object"
+    },
     "configMaps": {
       "items": {
         "required": []
       },
       "title": "configMaps",
       "type": "array"
+    },
+    "containerName": {
+      "default": "",
+      "title": "containerName",
+      "type": "string"
     },
     "cronJobConcurrencyPolicy": {
       "default": "Replace",
@@ -460,6 +480,43 @@
       "description": "Optional namespace override for resources rendered by this chart.",
       "title": "namespaceOverride",
       "type": "string"
+    },
+    "networkPolicies": {
+      "description": "NetworkPolicies rendered and owned by this Helm release.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "annotations": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "required": [],
+            "type": "object"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "required": [],
+            "type": "object"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "spec": {
+            "required": [],
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "spec"
+        ],
+        "type": "object"
+      },
+      "title": "networkPolicies",
+      "type": "array"
     },
     "nodeSelector": {
       "required": [],

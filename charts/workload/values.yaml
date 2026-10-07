@@ -46,6 +46,11 @@ runtimeClassName: ""
 hostNetwork: false
 dnsPolicy: ""
 # @schema
+# type: [boolean, "null"]
+# @schema
+# Set false to prevent Kubernetes from mounting a service-account token in workload pods.
+automountServiceAccountToken: null
+# @schema
 # type: [integer, "null"]
 # minimum: 0
 # @schema
@@ -73,9 +78,11 @@ imagePullSecrets: []
 # Override the container entrypoint command and arguments.
 command: []
 args: []
+containerName: ""
 
 nameOverride: ""
 fullnameOverride: ""
+commonLabels: {}
 
 serviceAccount:
   create: false
@@ -203,6 +210,30 @@ volumeMounts: []
 # PersistentVolumeClaims rendered and owned by this Helm release.
 persistentVolumeClaims: []
 configMaps: []
+
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: false
+#   required: [name, spec]
+#   properties:
+#     name:
+#       type: string
+#       minLength: 1
+#     annotations:
+#       type: object
+#       additionalProperties:
+#         type: string
+#     labels:
+#       type: object
+#       additionalProperties:
+#         type: string
+#     spec:
+#       type: object
+# @schema
+# NetworkPolicies rendered and owned by this Helm release.
+networkPolicies: []
 
 nodeSelector: {}
 tolerations: []

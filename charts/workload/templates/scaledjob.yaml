@@ -25,6 +25,9 @@ spec:
           {{- end }}
       spec:
         restartPolicy: {{ default "Never" .Values.restartPolicy }}
+        {{- if kindIs "bool" .Values.automountServiceAccountToken }}
+        automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
+        {{- end }}
         {{- with .Values.runtimeClassName }}
         runtimeClassName: {{ . }}
         {{- end }}
@@ -44,7 +47,7 @@ spec:
           {{- toYaml . | nindent 10 }}
         {{- end }}
         containers:
-          - name: {{ .Chart.Name }}
+          - name: {{ default .Chart.Name .Values.containerName }}
             {{- with .Values.securityContext }}
             securityContext:
               {{- toYaml . | nindent 14 }}

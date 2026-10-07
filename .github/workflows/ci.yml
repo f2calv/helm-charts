@@ -29,6 +29,9 @@ jobs:
       - name: test-workload-computed-annotations.sh
         run: .scripts/test-workload-computed-annotations.sh
 
+      - name: test-workload-ownership-controls.sh
+        run: .scripts/test-workload-ownership-controls.sh
+
   release:
     name: release (${{ matrix.chart }})
     needs: [lint, workload-tests]
