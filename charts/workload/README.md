@@ -20,7 +20,7 @@ owns the reusable Kubernetes resource structure.
 Install the `workload` chart directly from GHCR:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.2.0 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.3.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \
@@ -55,7 +55,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/workload
-    targetRevision: 1.2.0
+    targetRevision: 1.3.0
     helm:
       valuesObject:
         replicaCount: 1
@@ -119,6 +119,59 @@ An annotation key cannot appear in both `annotations` and
 
 Existing consumers are unchanged when `computedAnnotations` is omitted.
 
+### Environment Variables
+
+Use `envVars` for literal scalars, `envVarsValueFrom` for individual Kubernetes
+references, and `envVarsFrom` for complete ConfigMap or Secret imports.
+`envFieldRef` remains a concise downward-API shorthand, while `envSecrets` maps
+an environment variable to a Secret of the same key name.
+
+```yaml
+envVars:
+  LOG_LEVEL: Information
+envVarsValueFrom:
+  DATABASE_PASSWORD:
+    secretKeyRef:
+      name: database
+      key: password
+  NODE_NAME:
+    fieldRef:
+      fieldPath: spec.nodeName
+envVarsFrom:
+  - prefix: SHARED_
+    configMapRef:
+      name: shared-settings
+  - secretRef:
+      name: shared-secrets
+```
+
+Variable names must be unique across `envFieldRef`, `envVars`, `envSecrets`,
+and `envVarsValueFrom`; conflicting declarations fail rendering.
+
+### Network Policies
+
+Declare workload-owned policies through `networkPolicies`. Each entry requires a
+name and a Kubernetes `NetworkPolicySpec`; labels and annotations are optional.
+
+```yaml
+networkPolicies:
+  - name: allow-ingress
+    spec:
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: my-app
+      policyTypes:
+        - Ingress
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: ingress-system
+```
+
+Keep a policy outside the release only when it spans releases or requires an
+independent lifecycle or sync order.
+
 ### Persistence
 
 Declare PVCs alongside their consuming workload through `persistentVolumeClaims`.
@@ -179,12 +232,16 @@ updateStrategy: {}
 volumeClaimTemplates: []
 cronJobSchedule: ""
 cronJobConcurrencyPolicy: Replace
+cronJobStartingDeadlineSeconds: null
+cronJobSuccessfulJobsHistoryLimit: 3
+cronJobFailedJobsHistoryLimit: 1
 
 # Pod execution settings.
 restartPolicy: ""
 runtimeClassName: ""
 hostNetwork: false
 dnsPolicy: ""
+automountServiceAccountToken: null
 terminationGracePeriodSeconds: null
 
 # Container image and process.
@@ -195,10 +252,12 @@ image:
 imagePullSecrets: []
 command: []
 args: []
+containerName: ""
 
 # Resource naming and pod identity.
 nameOverride: ""
 fullnameOverride: ""
+commonLabels: {}
 serviceAccount:
   create: false
   automount: true
@@ -251,6 +310,7 @@ volumes: []
 volumeMounts: []
 persistentVolumeClaims: []
 configMaps: []
+networkPolicies: []
 nodeSelector: {}
 tolerations: []
 affinity: {}
@@ -267,6 +327,7 @@ podDisruptionBudget:
 envFieldRef: {}
 envVars: {}
 envSecrets: {}
+envVarsValueFrom: {}
 envVarsFrom: []
 
 # Job resource settings used when kind is Job.

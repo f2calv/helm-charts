@@ -14,6 +14,16 @@
       "title": "args",
       "type": "array"
     },
+    "automountServiceAccountToken": {
+      "default": "null",
+      "description": "Set false to prevent Kubernetes from mounting a service-account token in workload pods.",
+      "required": [],
+      "title": "automountServiceAccountToken",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
     "autoscaling": {
       "properties": {
         "enabled": {
@@ -34,6 +44,11 @@
       "title": "command",
       "type": "array"
     },
+    "commonLabels": {
+      "required": [],
+      "title": "commonLabels",
+      "type": "object"
+    },
     "configMaps": {
       "items": {
         "required": []
@@ -41,16 +56,51 @@
       "title": "configMaps",
       "type": "array"
     },
+    "containerName": {
+      "default": "",
+      "title": "containerName",
+      "type": "string"
+    },
     "cronJobConcurrencyPolicy": {
       "default": "Replace",
       "title": "cronJobConcurrencyPolicy",
       "type": "string"
+    },
+    "cronJobFailedJobsHistoryLimit": {
+      "default": 1,
+      "minimum": 0,
+      "required": [],
+      "title": "cronJobFailedJobsHistoryLimit",
+      "type": [
+        "integer",
+        "null"
+      ]
     },
     "cronJobSchedule": {
       "default": "",
       "description": "CronJob settings.",
       "title": "cronJobSchedule",
       "type": "string"
+    },
+    "cronJobStartingDeadlineSeconds": {
+      "default": "null",
+      "minimum": 0,
+      "required": [],
+      "title": "cronJobStartingDeadlineSeconds",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "cronJobSuccessfulJobsHistoryLimit": {
+      "default": 3,
+      "minimum": 0,
+      "required": [],
+      "title": "cronJobSuccessfulJobsHistoryLimit",
+      "type": [
+        "integer",
+        "null"
+      ]
     },
     "dnsPolicy": {
       "default": "",
@@ -90,11 +140,171 @@
     "envVarsFrom": {
       "description": "Sources passed directly to the container envFrom list.",
       "items": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "configMapRef"
+            ]
+          },
+          {
+            "required": [
+              "secretRef"
+            ]
+          }
+        ],
+        "properties": {
+          "configMapRef": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "prefix": {
+            "type": "string"
+          },
+          "secretRef": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
         "required": [],
         "type": "object"
       },
       "title": "envVarsFrom",
       "type": "array"
+    },
+    "envVarsValueFrom": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "configMapKeyRef"
+            ]
+          },
+          {
+            "required": [
+              "fieldRef"
+            ]
+          },
+          {
+            "required": [
+              "resourceFieldRef"
+            ]
+          },
+          {
+            "required": [
+              "secretKeyRef"
+            ]
+          }
+        ],
+        "properties": {
+          "configMapKeyRef": {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "key"
+            ],
+            "type": "object"
+          },
+          "fieldRef": {
+            "additionalProperties": false,
+            "properties": {
+              "apiVersion": {
+                "type": "string"
+              },
+              "fieldPath": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "fieldPath"
+            ],
+            "type": "object"
+          },
+          "resourceFieldRef": {
+            "additionalProperties": false,
+            "properties": {
+              "containerName": {
+                "type": "string"
+              },
+              "divisor": {
+                "type": "string"
+              },
+              "resource": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "resource"
+            ],
+            "type": "object"
+          },
+          "secretKeyRef": {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "key"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "description": "Kubernetes EnvVarSource entries keyed by environment variable name.",
+      "required": [],
+      "title": "envVarsValueFrom"
     },
     "extraContainers": {
       "items": {
@@ -460,6 +670,43 @@
       "description": "Optional namespace override for resources rendered by this chart.",
       "title": "namespaceOverride",
       "type": "string"
+    },
+    "networkPolicies": {
+      "description": "NetworkPolicies rendered and owned by this Helm release.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "annotations": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "required": [],
+            "type": "object"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "required": [],
+            "type": "object"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "spec": {
+            "required": [],
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "spec"
+        ],
+        "type": "object"
+      },
+      "title": "networkPolicies",
+      "type": "array"
     },
     "nodeSelector": {
       "required": [],

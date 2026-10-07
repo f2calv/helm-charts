@@ -1,4 +1,8 @@
 replicaCount: 1
+automountServiceAccountToken: false
+containerName: app
+commonLabels:
+  app.kubernetes.io/component: web
 image:
   repository: busybox
   pullPolicy: IfNotPresent
@@ -7,3 +11,14 @@ command:
   - -c
 args:
   - sleep 3600
+networkPolicies:
+  - name: allow-ingress
+    spec:
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: workload
+      policyTypes:
+        - Ingress
+      ingress:
+        - from:
+            - namespaceSelector: {}

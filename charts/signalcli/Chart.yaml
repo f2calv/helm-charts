@@ -2,7 +2,7 @@ apiVersion: v2
 name: signalcli
 description: Deploys the bbernhard signal-cli-rest-api container, a REST and JSON-RPC wrapper around signal-cli.
 type: application
-version: 1.0.2
+version: 1.0.3
 appVersion: "0.100"
 home: https://github.com/bbernhard/signal-cli-rest-api
 annotations:
@@ -16,8 +16,8 @@ keywords:
   - messaging
 dependencies:
   - name: workload
-    version: 1.0.3
-    repository: oci://ghcr.io/f2calv/charts
+    version: 1.3.0
+    repository: file://../workload
     # Lowercase: Helm derives the subchart's resource names from the alias, and a Kubernetes
     # resource name must be a DNS-1123 subdomain.
     alias: signalcli
