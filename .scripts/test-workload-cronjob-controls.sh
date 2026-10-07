@@ -18,7 +18,10 @@ yq -e '
   select(.kind == "CronJob") |
   .spec.startingDeadlineSeconds == 60 and
   .spec.successfulJobsHistoryLimit == 3 and
-  .spec.failedJobsHistoryLimit == 2
+  .spec.failedJobsHistoryLimit == 2 and
+  (.spec.jobTemplate.spec | has("ttlSecondsAfterFinished") | not) and
+  .spec.jobTemplate.spec.backoffLimit == 2 and
+  .spec.jobTemplate.spec.activeDeadlineSeconds == 120
 ' "$RENDERED" >/dev/null
 
 helm template defaults "$CHART" \
@@ -29,7 +32,10 @@ yq -e '
   select(.kind == "CronJob") |
   (.spec | has("startingDeadlineSeconds") | not) and
   .spec.successfulJobsHistoryLimit == 3 and
-  .spec.failedJobsHistoryLimit == 1
+  .spec.failedJobsHistoryLimit == 1 and
+  .spec.jobTemplate.spec.ttlSecondsAfterFinished == 360 and
+  .spec.jobTemplate.spec.backoffLimit == 1 and
+  (.spec.jobTemplate.spec | has("activeDeadlineSeconds") | not)
 ' "$DEFAULT_RENDERED" >/dev/null
 
 if helm template invalid "$CHART" \
