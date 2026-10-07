@@ -66,11 +66,41 @@
       "title": "cronJobConcurrencyPolicy",
       "type": "string"
     },
+    "cronJobFailedJobsHistoryLimit": {
+      "default": 1,
+      "minimum": 0,
+      "required": [],
+      "title": "cronJobFailedJobsHistoryLimit",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
     "cronJobSchedule": {
       "default": "",
       "description": "CronJob settings.",
       "title": "cronJobSchedule",
       "type": "string"
+    },
+    "cronJobStartingDeadlineSeconds": {
+      "default": "null",
+      "minimum": 0,
+      "required": [],
+      "title": "cronJobStartingDeadlineSeconds",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "cronJobSuccessfulJobsHistoryLimit": {
+      "default": 3,
+      "minimum": 0,
+      "required": [],
+      "title": "cronJobSuccessfulJobsHistoryLimit",
+      "type": [
+        "integer",
+        "null"
+      ]
     },
     "dnsPolicy": {
       "default": "",

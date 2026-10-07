@@ -203,6 +203,9 @@ updateStrategy: {}
 volumeClaimTemplates: []
 cronJobSchedule: ""
 cronJobConcurrencyPolicy: Replace
+cronJobStartingDeadlineSeconds: null
+cronJobSuccessfulJobsHistoryLimit: 3
+cronJobFailedJobsHistoryLimit: 1
 
 # Pod execution settings.
 restartPolicy: ""

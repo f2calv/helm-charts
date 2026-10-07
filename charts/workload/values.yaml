@@ -39,6 +39,21 @@ volumeClaimTemplates: []
 # CronJob settings.
 cronJobSchedule: ""
 cronJobConcurrencyPolicy: Replace
+# @schema
+# type: [integer, "null"]
+# minimum: 0
+# @schema
+cronJobStartingDeadlineSeconds: null
+# @schema
+# type: [integer, "null"]
+# minimum: 0
+# @schema
+cronJobSuccessfulJobsHistoryLimit: 3
+# @schema
+# type: [integer, "null"]
+# minimum: 0
+# @schema
+cronJobFailedJobsHistoryLimit: 1
 
 # Pod execution settings. Leave empty for a kind-specific default.
 restartPolicy: ""

@@ -9,6 +9,15 @@ metadata:
 spec:
   schedule: {{ .Values.cronJobSchedule | quote }}
   concurrencyPolicy: {{ .Values.cronJobConcurrencyPolicy }}
+  {{- if not (kindIs "invalid" .Values.cronJobStartingDeadlineSeconds) }}
+  startingDeadlineSeconds: {{ .Values.cronJobStartingDeadlineSeconds }}
+  {{- end }}
+  {{- if not (kindIs "invalid" .Values.cronJobSuccessfulJobsHistoryLimit) }}
+  successfulJobsHistoryLimit: {{ .Values.cronJobSuccessfulJobsHistoryLimit }}
+  {{- end }}
+  {{- if not (kindIs "invalid" .Values.cronJobFailedJobsHistoryLimit) }}
+  failedJobsHistoryLimit: {{ .Values.cronJobFailedJobsHistoryLimit }}
+  {{- end }}
   jobTemplate:
     spec:
       template:

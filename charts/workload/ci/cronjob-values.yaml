@@ -1,5 +1,8 @@
 kind: CronJob
 cronJobSchedule: "*/5 * * * *"
+cronJobStartingDeadlineSeconds: 60
+cronJobSuccessfulJobsHistoryLimit: 3
+cronJobFailedJobsHistoryLimit: 2
 image:
   repository: busybox
   pullPolicy: IfNotPresent
