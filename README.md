@@ -31,3 +31,7 @@ flowchart LR
   Package --> Registry[("GHCR OCI package")]
   Registry --> Consumers["Helm and Argo CD consumers"]
 ```
+
+## License
+
+This project is released under the [MIT License](LICENSE).
