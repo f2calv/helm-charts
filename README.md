@@ -7,8 +7,8 @@ templates, or deploy signal-cli-rest-api with persistent Signal account state.
 
 | Chart                                   | Latest version | OCI reference                           | Purpose                                                                                                                                                                                     |
 | --------------------------------------- | -------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [signalcli](charts/signalcli/README.md) | `1.0.5`        | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
-| [workload](charts/workload/README.md)   | `1.5.0`        | `oci://ghcr.io/f2calv/charts/workload`  | Deploys common Kubernetes workload kinds through framework-neutral templates with concise defaults and opt-in operational controls.                                                         |
+| [signalcli](charts/signalcli/README.md) | `1.1.0`        | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
+| [workload](charts/workload/README.md)   | `1.6.0`        | `oci://ghcr.io/f2calv/charts/workload`  | Deploys common Kubernetes workload kinds through framework-neutral templates with concise defaults and opt-in operational controls.                                                         |
 
 Browse the public [workload package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fworkload)
 or [signalcli package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fsignalcli).
@@ -18,7 +18,7 @@ or [signalcli package](https://github.com/f2calv/helm-charts/pkgs/container/char
 With an OCI-capable Helm client and a Kubernetes context, install a single HTTP workload:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.5.0 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.6.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \

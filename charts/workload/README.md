@@ -24,7 +24,7 @@ Ingress needs a matching controller, and persistent claims need a suitable stora
 Install the `workload` chart directly from GHCR:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.5.0 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.6.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \
@@ -59,7 +59,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/workload
-    targetRevision: 1.5.0
+    targetRevision: 1.6.0
     helm:
       valuesObject:
         replicaCount: 1
@@ -90,6 +90,7 @@ The schema does not prove that arbitrary Kubernetes objects or controller-specif
   Ingress, storage, configuration, policies and KEDA resources have separate conditions.
 - [`image.tag`](https://github.com/f2calv/helm-charts/blob/main/charts/workload/templates/deployment.yaml)
   falls back to `appVersion` (`1.1.0`), not a tag inferred from your image. Supply a real image tag.
+  The `app.kubernetes.io/version` label uses the same resolved tag, without any `@sha256` digest.
 - [`autoscaling.enabled`](https://github.com/f2calv/helm-charts/blob/main/charts/workload/templates/deployment.yaml)
   only omits `spec.replicas`; it does not create a HorizontalPodAutoscaler.
 - [`kind`](https://github.com/f2calv/helm-charts/blob/main/charts/workload/values.yaml)

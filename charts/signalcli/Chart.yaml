@@ -16,7 +16,7 @@ keywords:
   - messaging
 dependencies:
   - name: workload
-    version: 1.5.0
+    version: 1.6.0
     repository: file://../workload
     # Lowercase: Helm derives the subchart's resource names from the alias, and a Kubernetes
     # resource name must be a DNS-1123 subdomain.
