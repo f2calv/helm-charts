@@ -3,22 +3,30 @@
 Deploys the [bbernhard/signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api)
 container, a REST and JSON-RPC wrapper around [signal-cli](https://github.com/AsamK/signal-cli).
 
-The upstream project ships no Helm chart. This one supplies the parts that are easy to get wrong:
-a volume for account state, probes that match what the image actually exposes, resources sized for
+This chart supplies a volume for account state, probes that match what the image exposes, resources sized for
 a JVM, and schema validation of the environment variables that change its behaviour.
 
-The chart depends on the sibling [`workload`](../workload/README.md) chart at an exact version and
+The chart depends on the sibling
+[`workload`](https://github.com/f2calv/helm-charts/blob/main/charts/workload/README.md) chart at an exact version and
 bundles that dependency into every published package. Everything under `signalcli` is passed to
 that subchart, so its keys are the workload chart's keys.
 
 ## Install
+
+Requires an OCI-capable Helm client, a Kubernetes cluster and a default StorageClass (or an explicit
+class in your values). Public GHCR pulls do not require a login. Installation starts the API but
+does not register or link a Signal account.
+
+The default Service and PVC names are fixed (`signalcli` and `signalcli-pvc`). For multiple releases
+in one namespace, override `signalcli.fullnameOverride`, the claim name and its volume reference
+together; changing only the Helm release name does not isolate them.
 
 ### Helm
 
 Install the application-specific `signalcli` chart directly from GHCR:
 
 ```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.5 \
+helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.1.0 \
   --namespace my-namespace --create-namespace \
   --set-string signalcli.envVars.MODE=json-rpc \
   --set-string signalcli.envVars.LOG_LEVEL=info
@@ -51,7 +59,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/signalcli
-    targetRevision: 1.0.5
+    targetRevision: 1.1.0
     helm:
       valuesObject:
         signalcli:
@@ -62,6 +70,8 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
 ```
 
 ## Setup
@@ -98,23 +108,28 @@ volume, every restart discards the registration and you start again.
 
 ## Configuration
 
+The [`signalcli` values](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml)
+override the bundled workload chart. Its generated
+[schema](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.schema.json)
+validates the declared environment settings; open-ended extra variables still need upstream verification.
+
 | Value | Default | Notes |
 | --- | --- | --- |
-| `signalcli.replicaCount` | `1` | Capped at one because one registered device owns one state volume |
-| `signalcli.strategy.type` | `Recreate` | The old pod releases the account lock before the new one starts |
-| `signalcli.image.tag` | `0.100` | Pinned because an empty tag falls back to the workload chart's `appVersion` |
-| `signalcli.envVars.MODE` | `json-rpc` | Also decides the receive endpoint's shape |
-| `signalcli.envVars.LOG_LEVEL` | `info` | |
-| `signalcli.startupProbe` | `/v1/about` | Allows the JVM up to five minutes to load account state |
-| `signalcli.readinessProbe` | `/v1/about` | Marks the pod ready when it can serve requests |
-| `signalcli.livenessProbe` | `false` | Avoids restarting a slow or busy JVM and disconnecting clients |
-| `signalcli.persistentVolumeClaims` | 512Mi `ReadWriteOnce` | Set to `[]` for an ephemeral install |
+| [`signalcli.replicaCount`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `1` | Capped at one because one registered device owns one state volume |
+| [`signalcli.strategy.type`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `Recreate` | The old pod releases the account lock before the new one starts |
+| [`signalcli.image.tag`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `0.101` | Pinned because an empty tag falls back to the workload chart's `appVersion` |
+| [`signalcli.envVars.MODE`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `json-rpc` | Also decides the receive endpoint's shape |
+| [`signalcli.envVars.LOG_LEVEL`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `info` | |
+| [`signalcli.startupProbe`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `/v1/about` | Approximately five minutes of startup allowance, plus the initial delay |
+| [`signalcli.readinessProbe`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `/v1/about` | Marks the pod ready when it can serve requests |
+| [`signalcli.livenessProbe`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `false` | Avoids restarting a slow or busy JVM and disconnecting clients |
+| [`signalcli.persistentVolumeClaims`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | 512Mi `ReadWriteOnce` | For ephemeral use, clear claims, volumes and mounts together |
 
 Environment variables keep their upstream names verbatim, so each traces directly back to the
 [bbernhard documentation](https://github.com/bbernhard/signal-cli-rest-api). The map stays
 **open**: a variable added by a newer image release can be
-set immediately, without waiting for a chart release. Every variable the image documents is
-validated, so a bad value fails the install rather than the pod:
+set immediately, without waiting for a chart release. The declared variables below are
+validated, so an invalid declared value fails the install rather than the pod:
 
 ```text
 Error: values don't meet the specifications of the schema(s) in the following chart(s):
@@ -123,10 +138,14 @@ Error: values don't meet the specifications of the schema(s) in the following ch
 
 ### Validated environment variables
 
+These names and constraints are declared in
+[`signalcli.envVars`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml).
+The upstream-default column describes the image, not extra values injected by this chart.
+
 | Variable | Accepted | Upstream default |
 | --- | --- | --- |
 | `MODE` | `normal`, `native`, `json-rpc`, `json-rpc-native` | `normal` |
-| `AUTO_RECEIVE_SCHEDULE` | five-field cron expression | unset |
+| `AUTO_RECEIVE_SCHEDULE` | five non-empty whitespace-separated fields; image interprets cron syntax | unset |
 | `LOG_LEVEL` | `debug`, `info`, `warn`, `error` | `info` |
 | `DEFAULT_SIGNAL_TEXT_MODE` | `normal`, `styled` | `normal` |
 | `PORT` | 1–65535 | `8080` |
@@ -170,7 +189,7 @@ signalcli:
   image:
     repository: bbernhard/signal-cli-rest-api
     pullPolicy: IfNotPresent
-    tag: "0.100"
+    tag: "0.101"
   service:
     enabled: true
     name: http
@@ -226,26 +245,14 @@ signalcli:
 
 ## Persistence
 
-Account state is small and grows slowly. A volume carrying a linked account for five months held:
-
-```text
-17M total
- 9.1M  data/<account>.d     message and session database
- 7.6M  stickers             downloaded sticker packs
- 120K  avatars
-  56K  attachments
- 4.0K  data/<account>       account JSON, including the private keys
-```
-
-The default request is 512Mi, comfortably more than that needs, for three reasons: a PVC can be
-grown but never shrunk, filesystem overhead is a punitive share of a very small volume, and many
-dynamic provisioners round anything below 1Gi up regardless. Sticker packs are the one component
-that grows without bound — set `JSON_RPC_IGNORE_STICKERS: true` if that matters more than fidelity.
+The default request is 512Mi. Size it for your account's data, attachments, avatars and stickers;
+the chart does not enforce a retention limit. PVCs cannot be shrunk. Set
+`JSON_RPC_IGNORE_STICKERS: true` if sticker downloads are unnecessary.
 
 `storageClassName` is left unset so a clean install works anywhere, which means the cluster default
 is used. **Set it explicitly for anything you intend to keep.** A cluster can carry more than one
 default StorageClass, in which case the most recently created one wins, and you can silently land
-on a class that is neither replicated nor expandable. Set it through an Argo CD `valuesObject`:
+on a class that is neither replicated nor expandable. Set it through Helm:
 
 ```bash
 helm upgrade --install signalcli oci://ghcr.io/f2calv/charts/signalcli \
@@ -278,7 +285,7 @@ StorageClass with `allowVolumeExpansion: true`.
 The volume can be removed entirely for a throwaway evaluation, at the cost of re-registering the
 account after every restart. There is no `persistence.enabled` toggle, because the storage values
 are consumed by a subchart and Helm resolves subchart values before templating, so the chart cannot
-conditionally remove them. Clear all three lists instead:
+conditionally remove them. Clear all three lists instead (`--set-json` requires Helm 3.10 or newer):
 
 ```bash
 helm upgrade --install signalcli oci://ghcr.io/f2calv/charts/signalcli \
@@ -301,7 +308,8 @@ signalcli:
 
 The registration is ordinary files, so it can be copied into a new claim. Scale down first: the
 message database is a live SQLite file and copying it from under a running JVM can capture a torn
-write.
+write. The copy example assumes a separately created helper pod mounting the stopped account's claim;
+the chart does not create that helper.
 
 ```bash
 kubectl scale --namespace my-namespace deployment/signalcli --replicas=0
@@ -313,7 +321,28 @@ impersonate the linked device. Note also that Signal's double ratchet advances w
 so restoring a *stale* copy over an account that has kept running leaves the session desynchronised
 and messages undecryptable — restore the most recent state, or re-link the device instead.
 
+## Upgrading
+
+### 1.1.0
+
+The default image moves from signal-cli-rest-api 0.100 to 0.101 (signal-cli 0.14.8). The chart
+values are unchanged, but the API and logging behaviour are not:
+
+- `POST /v2/send` returns an array with one entry per recipient type instead of a single object.
+  Each entry carries the `timestamp` and, when some recipients could not be reached, an `errors`
+  object. Update clients that parse the send response before upgrading.
+- In `json-rpc` mode signal-cli now writes its plain-text output to the container log, including
+  every received envelope with the sender, their number and the message text. Exclude the container
+  from log collection if its logs leave the cluster.
+- Upstream merged the rootless image into the single published image.
+
+To stay on 0.100 temporarily, set `signalcli.image.tag: "0.100"`.
+
 ## Related Projects
+
+See the [chart dependency declaration](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/Chart.yaml)
+and [locked workload version](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/Chart.lock)
+for the packaged dependency contract.
 
 - [Kubernetes](https://kubernetes.io/) provides the workload resources rendered by this chart.
 - [bbernhard/signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api)
@@ -321,3 +350,25 @@ and messages undecryptable — restore the most recent state, or re-link the dev
   for the REST and JSON-RPC APIs.
 - [signalizr](https://github.com/f2calv/signalizr) provides a controlled Signal gateway for
   applications that should not own an account connection directly.
+
+## Service Architecture
+
+The workload subchart creates the Service, Deployment and account-state PVC. Register or link
+through the API after installation; neither the chart nor the volume registers an account for you.
+Keep the API private to trusted clients: chart defaults do not add authentication or TLS.
+
+```mermaid
+graph LR
+  Consumer([Trusted API client]) --> Service[ClusterIP Service, port 80]
+  Service --> API[signal-cli-rest-api, port 8080]
+  API --> Signal[Signal service]
+  API --> State[(Account-state PVC)]
+  classDef chart fill:#e8f0fe,stroke:#315da8
+  class Service,State chart
+```
+
+This diagram is supplemental; chart registry renderers may not render Mermaid.
+
+## License
+
+[MIT License](https://github.com/f2calv/helm-charts/blob/main/LICENSE).

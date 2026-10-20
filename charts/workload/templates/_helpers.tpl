@@ -26,8 +26,10 @@
 {{- define "workload.labels" -}}
 helm.sh/chart: {{ include "workload.chart" . }}
 {{ include "workload.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- /* The deployed image tag, without any @sha256 digest and reduced to label-safe characters. */}}
+{{- $tag := splitList "@" (.Values.image.tag | default .Chart.AppVersion | toString) | first }}
+{{- with regexReplaceAll "[^-A-Za-z0-9_.]" $tag "_" | trunc 63 | trimAll "-_." }}
+app.kubernetes.io/version: {{ . | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- with .Values.commonLabels }}
