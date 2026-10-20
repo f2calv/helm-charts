@@ -26,7 +26,7 @@ together; changing only the Helm release name does not isolate them.
 Install the application-specific `signalcli` chart directly from GHCR:
 
 ```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.0.5 \
+helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.1.0 \
   --namespace my-namespace --create-namespace \
   --set-string signalcli.envVars.MODE=json-rpc \
   --set-string signalcli.envVars.LOG_LEVEL=info
@@ -59,7 +59,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/signalcli
-    targetRevision: 1.0.5
+    targetRevision: 1.1.0
     helm:
       valuesObject:
         signalcli:
@@ -117,7 +117,7 @@ validates the declared environment settings; open-ended extra variables still ne
 | --- | --- | --- |
 | [`signalcli.replicaCount`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `1` | Capped at one because one registered device owns one state volume |
 | [`signalcli.strategy.type`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `Recreate` | The old pod releases the account lock before the new one starts |
-| [`signalcli.image.tag`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `0.100` | Pinned because an empty tag falls back to the workload chart's `appVersion` |
+| [`signalcli.image.tag`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `0.101` | Pinned because an empty tag falls back to the workload chart's `appVersion` |
 | [`signalcli.envVars.MODE`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `json-rpc` | Also decides the receive endpoint's shape |
 | [`signalcli.envVars.LOG_LEVEL`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `info` | |
 | [`signalcli.startupProbe`](https://github.com/f2calv/helm-charts/blob/main/charts/signalcli/values.yaml) | `/v1/about` | Approximately five minutes of startup allowance, plus the initial delay |
@@ -189,7 +189,7 @@ signalcli:
   image:
     repository: bbernhard/signal-cli-rest-api
     pullPolicy: IfNotPresent
-    tag: "0.100"
+    tag: "0.101"
   service:
     enabled: true
     name: http
@@ -320,6 +320,23 @@ The account JSON holds the device's private keys. Treat the copy as a credential
 impersonate the linked device. Note also that Signal's double ratchet advances with every message,
 so restoring a *stale* copy over an account that has kept running leaves the session desynchronised
 and messages undecryptable — restore the most recent state, or re-link the device instead.
+
+## Upgrading
+
+### 1.1.0
+
+The default image moves from signal-cli-rest-api 0.100 to 0.101 (signal-cli 0.14.8). The chart
+values are unchanged, but the API and logging behaviour are not:
+
+- `POST /v2/send` returns an array with one entry per recipient type instead of a single object.
+  Each entry carries the `timestamp` and, when some recipients could not be reached, an `errors`
+  object. Update clients that parse the send response before upgrading.
+- In `json-rpc` mode signal-cli now writes its plain-text output to the container log, including
+  every received envelope with the sender, their number and the message text. Exclude the container
+  from log collection if its logs leave the cluster.
+- Upstream merged the rootless image into the single published image.
+
+To stay on 0.100 temporarily, set `signalcli.image.tag: "0.100"`.
 
 ## Related Projects
 

@@ -187,7 +187,7 @@
               "type": "string"
             },
             "tag": {
-              "default": "0.100",
+              "default": "0.101",
               "description": "Pinned rather than left empty: the workload subchart falls back to *its own* appVersion, so\nan empty tag resolves to the workload chart version and pulls an image that does not exist.\nKeep this in step with the chart appVersion.",
               "title": "tag",
               "type": "string"
