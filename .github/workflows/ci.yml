@@ -53,4 +53,3 @@ jobs:
     uses: ./.github/workflows/_publish-chart.yml
     with:
       chart: ${{ matrix.chart }}
-    secrets: inherit
