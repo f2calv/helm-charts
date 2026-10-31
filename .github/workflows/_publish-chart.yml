@@ -53,7 +53,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: f2calv/gha-workflows/.github/workflows/helm-chart-package.yml@v1
+    uses: f2calv/gha-workflows/.github/workflows/helm-chart-package.yml@f2calv/2026-10-helm-chart-package-hardening
     with:
       tag: ${{ needs.metadata.outputs.version }}
       image-registry: ghcr.io
