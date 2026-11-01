@@ -57,12 +57,12 @@ repos:
         ^charts/[^/]+/values\.schema\.json$
       )
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.49.1
+  rev: v0.50.0
   hooks:
   - id: markdownlint
     args: ["--disable", "MD013", "--disable", "MD034", "--"]
 - repo: https://github.com/dadav/helm-schema
-  rev: 0.23.5
+  rev: 0.24.0
   hooks:
   - id: helm-schema
     name: Generate workload jsonschema

@@ -351,7 +351,7 @@ for the packaged dependency contract.
 - [signalizr](https://github.com/f2calv/signalizr) provides a controlled Signal gateway for
   applications that should not own an account connection directly.
 
-## Service Architecture
+## Data Flow
 
 The workload subchart creates the Service, Deployment and account-state PVC. Register or link
 through the API after installation; neither the chart nor the volume registers an account for you.
