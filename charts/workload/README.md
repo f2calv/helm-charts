@@ -414,7 +414,7 @@ keda:
 - [Kubernetes](https://kubernetes.io/) provides the workload resources rendered by this chart.
 - [KEDA](https://keda.sh/) provides the `ScaledObject` and `ScaledJob` autoscaling resources.
 
-## Service Architecture
+## Data Flow
 
 This shows the HTTP service path, not the Job/CronJob modes. Your image and values supply the
 application; the chart creates neither an ingress controller nor a storage provisioner.
