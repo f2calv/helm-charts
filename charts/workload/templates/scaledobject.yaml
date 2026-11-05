@@ -13,7 +13,17 @@ spec:
   cooldownPeriod: {{ .Values.keda.cooldownPeriod }}
   minReplicaCount: {{ .Values.keda.minReplicaCount }}
   maxReplicaCount: {{ .Values.keda.maxReplicaCount }}
+  {{- with .Values.keda.advanced }}
+  advanced:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   triggers:
+  {{- if .Values.keda.http.enabled }}
+  - type: external-push
+    metadata:
+      scalerAddress: {{ .Values.keda.http.scalerAddress | quote }}
+      interceptorRoute: {{ include "workload.fullname" . | quote }}
+  {{- end }}
   {{- range .Values.keda.triggers }}
   - type: {{ .type }}
     metadata:

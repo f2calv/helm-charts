@@ -122,6 +122,20 @@ envFrom:
 {{- $name := .name -}}
 {{- $serviceName := .serviceName -}}
 {{- $servicePort := $spec.servicePort | default $root.Values.service.port -}}
+{{- $namespace := include "workload.namespace" $root -}}
+{{- if $root.Values.keda.http.enabled -}}
+{{- $interceptor := $root.Values.keda.http.interceptor -}}
+{{- $serviceName = $interceptor.serviceName -}}
+{{- $servicePort = $interceptor.port -}}
+{{- $namespace = default $namespace $interceptor.namespace -}}
+{{- if and $spec.servicePort (ne (int $spec.servicePort) (int $servicePort)) -}}
+{{- fail "HTTP-scaled ingress.servicePort must be empty or match keda.http.interceptor.port" -}}
+{{- end -}}
+{{- if ne $namespace (include "workload.namespace" $root) -}}
+{{- $identity := printf "%s/%s" (include "workload.namespace" $root) $name -}}
+{{- $name = printf "%s-%s" ($name | trunc 54 | trimSuffix "-") ($identity | sha256sum | trunc 8) -}}
+{{- end -}}
+{{- end -}}
 {{- $annotations := deepCopy ($spec.annotations | default dict) -}}
 {{- range $annotationName, $computed := ($spec.computedAnnotations | default dict) -}}
 {{- if hasKey $annotations $annotationName -}}
@@ -138,7 +152,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $name }}
-  namespace: {{ include "workload.namespace" $root }}
+  namespace: {{ $namespace }}
   labels:
     {{- include "workload.labels" $root | nindent 4 }}
   {{- with $annotations }}
@@ -176,4 +190,33 @@ spec:
                   number: {{ $servicePort }}
           {{- end }}
     {{- end }}
+{{- end -}}
+
+{{- define "workload.validateHttpScaling" -}}
+{{- if .Values.keda.http.enabled -}}
+{{- if ne .Values.kind "ScaledObject" -}}
+{{- fail "keda.http.enabled requires kind: ScaledObject" -}}
+{{- end -}}
+{{- if le (int .Values.replicaCount) 0 -}}
+{{- fail "keda.http.enabled requires replicaCount > 0 to render the Deployment and Service; use keda.minReplicaCount: 0 for scale-to-zero" -}}
+{{- end -}}
+{{- if not .Values.autoscaling.enabled -}}
+{{- fail "keda.http.enabled requires autoscaling.enabled: true so KEDA owns Deployment replicas" -}}
+{{- end -}}
+{{- if or (not .Values.service.enabled) (ne .Values.service.protocol "TCP") -}}
+{{- fail "keda.http.enabled requires an enabled TCP Service" -}}
+{{- end -}}
+{{- if gt (int .Values.keda.minReplicaCount) (int .Values.keda.maxReplicaCount) -}}
+{{- fail "keda.minReplicaCount must not exceed keda.maxReplicaCount" -}}
+{{- end -}}
+{{- if not .Values.keda.http.rules -}}
+{{- fail "keda.http.enabled requires explicit keda.http.rules" -}}
+{{- end -}}
+{{- if not .Values.keda.http.scalingMetric -}}
+{{- fail "keda.http.enabled requires keda.http.scalingMetric.concurrency or requestRate" -}}
+{{- end -}}
+{{- if not (regexMatch `^\S+:[0-9]+$` .Values.keda.http.scalerAddress) -}}
+{{- fail "keda.http.scalerAddress must be a non-empty host:port address" -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}

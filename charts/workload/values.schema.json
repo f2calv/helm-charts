@@ -555,6 +555,12 @@
     "keda": {
       "description": "KEDA settings used by ScaledObject and ScaledJob workloads.",
       "properties": {
+        "advanced": {
+          "description": "KEDA-native advanced settings, including horizontalPodAutoscalerConfig.behavior.",
+          "required": [],
+          "title": "advanced",
+          "type": "object"
+        },
         "cooldownPeriod": {
           "default": "300",
           "minimum": 0,
@@ -575,6 +581,202 @@
           "minimum": 0,
           "required": [],
           "title": "failedJobsHistoryLimit"
+        },
+        "http": {
+          "additionalProperties": false,
+          "description": "Requires the separately installed KEDA HTTP add-on with the v1beta1 InterceptorRoute API.",
+          "properties": {
+            "coldStart": {
+              "additionalProperties": false,
+              "description": "Optional per-route cold-start queue bound, applied per interceptor replica.",
+              "properties": {
+                "maxPendingRequests": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "coldStart",
+              "type": "object"
+            },
+            "enabled": {
+              "default": false,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "interceptor": {
+              "additionalProperties": false,
+              "properties": {
+                "namespace": {
+                  "default": "",
+                  "description": "Empty means the workload namespace. Ingress resources are placed beside this Service.",
+                  "title": "namespace",
+                  "type": "string"
+                },
+                "port": {
+                  "default": "8080",
+                  "maximum": 65535,
+                  "minimum": 1,
+                  "required": [],
+                  "title": "port"
+                },
+                "serviceName": {
+                  "default": "keda-add-ons-http-interceptor-proxy",
+                  "minLength": 1,
+                  "required": [],
+                  "title": "serviceName"
+                }
+              },
+              "required": [],
+              "title": "interceptor"
+            },
+            "rules": {
+              "description": "Explicit matches prevent an accidental catch-all route in a shared interceptor.",
+              "items": {
+                "additionalProperties": false,
+                "anyOf": [
+                  {
+                    "required": [
+                      "hosts"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "paths"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "headers"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "headers": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "hosts": {
+                    "items": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "paths": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "value": {
+                          "pattern": "^/",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              "title": "rules",
+              "type": "array"
+            },
+            "scalerAddress": {
+              "default": "",
+              "description": "External scaler gRPC address, including its namespace and port.",
+              "title": "scalerAddress",
+              "type": "string"
+            },
+            "scalingMetric": {
+              "additionalProperties": false,
+              "description": "Set concurrency, requestRate, or both, with an explicit targetValue.",
+              "properties": {
+                "concurrency": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "targetValue": {
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "targetValue"
+                  ],
+                  "type": "object"
+                },
+                "requestRate": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "granularity": {
+                      "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$",
+                      "type": "string"
+                    },
+                    "targetValue": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "window": {
+                      "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "targetValue"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "scalingMetric",
+              "type": "object"
+            },
+            "timeouts": {
+              "additionalProperties": false,
+              "description": "Omitted fields inherit interceptor defaults; 0s disables that timeout.",
+              "properties": {
+                "readiness": {
+                  "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$",
+                  "type": "string"
+                },
+                "request": {
+                  "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$",
+                  "type": "string"
+                },
+                "responseHeader": {
+                  "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "timeouts",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "http"
         },
         "jobTargetRef": {
           "properties": {

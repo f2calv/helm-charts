@@ -1,0 +1,26 @@
+{{- include "workload.validateHttpScaling" . -}}
+{{- if .Values.keda.http.enabled }}
+apiVersion: http.keda.sh/v1beta1
+kind: InterceptorRoute
+metadata:
+  name: {{ include "workload.fullname" . }}
+  namespace: {{ include "workload.namespace" . }}
+  labels:
+    {{- include "workload.labels" . | nindent 4 }}
+spec:
+  target:
+    service: {{ include "workload.fullname" . }}
+    port: {{ .Values.service.port }}
+  rules:
+    {{- toYaml .Values.keda.http.rules | nindent 4 }}
+  scalingMetric:
+    {{- toYaml .Values.keda.http.scalingMetric | nindent 4 }}
+  {{- with .Values.keda.http.timeouts }}
+  timeouts:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.keda.http.coldStart }}
+  coldStart:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

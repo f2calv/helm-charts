@@ -38,6 +38,9 @@ jobs:
       - name: test-workload-ownership-controls.sh
         run: .scripts/test-workload-ownership-controls.sh
 
+      - name: test-workload-http-scaling.sh
+        run: .scripts/test-workload-http-scaling.sh
+
   release:
     name: release (${{ matrix.chart }})
     needs: [lint, workload-tests]

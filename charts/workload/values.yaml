@@ -470,3 +470,126 @@ keda:
   # Trigger metadata remains open because its shape is scaler-specific.
   triggers: []
   triggerAuthentications: []
+  # KEDA-native advanced settings, including horizontalPodAutoscalerConfig.behavior.
+  advanced: {}
+  # @schema
+  # additionalProperties: false
+  # @schema
+  # Requires the separately installed KEDA HTTP add-on with the v1beta1 InterceptorRoute API.
+  http:
+    enabled: false
+    # External scaler gRPC address, including its namespace and port.
+    scalerAddress: ""
+    # @schema
+    # additionalProperties: false
+    # @schema
+    interceptor:
+      # @schema
+      # minLength: 1
+      # @schema
+      serviceName: keda-add-ons-http-interceptor-proxy
+      # Empty means the workload namespace. Ingress resources are placed beside this Service.
+      namespace: ""
+      # @schema
+      # minimum: 1
+      # maximum: 65535
+      # @schema
+      port: 8080
+    # @schema
+    # type: array
+    # items:
+    #   type: object
+    #   additionalProperties: false
+    #   anyOf:
+    #     - required: [hosts]
+    #     - required: [paths]
+    #     - required: [headers]
+    #   properties:
+    #     hosts:
+    #       type: array
+    #       minItems: 1
+    #       items:
+    #         type: string
+    #         minLength: 1
+    #     paths:
+    #       type: array
+    #       minItems: 1
+    #       items:
+    #         type: object
+    #         additionalProperties: false
+    #         required: [value]
+    #         properties:
+    #           value:
+    #             type: string
+    #             pattern: ^/
+    #     headers:
+    #       type: array
+    #       minItems: 1
+    #       items:
+    #         type: object
+    #         additionalProperties: false
+    #         required: [name]
+    #         properties:
+    #           name:
+    #             type: string
+    #             minLength: 1
+    #           value:
+    #             type: string
+    # @schema
+    # Explicit matches prevent an accidental catch-all route in a shared interceptor.
+    rules: []
+    # @schema
+    # type: object
+    # additionalProperties: false
+    # properties:
+    #   concurrency:
+    #     type: object
+    #     additionalProperties: false
+    #     required: [targetValue]
+    #     properties:
+    #       targetValue:
+    #         type: integer
+    #         minimum: 1
+    #   requestRate:
+    #     type: object
+    #     additionalProperties: false
+    #     required: [targetValue]
+    #     properties:
+    #       targetValue:
+    #         type: integer
+    #         minimum: 1
+    #       window:
+    #         type: string
+    #         pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+    #       granularity:
+    #         type: string
+    #         pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+    # @schema
+    # Set concurrency, requestRate, or both, with an explicit targetValue.
+    scalingMetric: {}
+    # @schema
+    # type: object
+    # additionalProperties: false
+    # properties:
+    #   request:
+    #     type: string
+    #     pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+    #   responseHeader:
+    #     type: string
+    #     pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+    #   readiness:
+    #     type: string
+    #     pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+    # @schema
+    # Omitted fields inherit interceptor defaults; 0s disables that timeout.
+    timeouts: {}
+    # @schema
+    # type: object
+    # additionalProperties: false
+    # properties:
+    #   maxPendingRequests:
+    #     type: integer
+    #     minimum: 1
+    # @schema
+    # Optional per-route cold-start queue bound, applied per interceptor replica.
+    coldStart: {}
