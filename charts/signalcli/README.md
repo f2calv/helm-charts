@@ -26,7 +26,7 @@ together; changing only the Helm release name does not isolate them.
 Install the application-specific `signalcli` chart directly from GHCR:
 
 ```bash
-helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.1.0 \
+helm install signalcli oci://ghcr.io/f2calv/charts/signalcli --version 1.2.0 \
   --namespace my-namespace --create-namespace \
   --set-string signalcli.envVars.MODE=json-rpc \
   --set-string signalcli.envVars.LOG_LEVEL=info
@@ -59,7 +59,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/signalcli
-    targetRevision: 1.1.0
+    targetRevision: 1.2.0
     helm:
       valuesObject:
         signalcli:
@@ -322,6 +322,12 @@ so restoring a *stale* copy over an account that has kept running leaves the ses
 and messages undecryptable — restore the most recent state, or re-link the device instead.
 
 ## Upgrading
+
+### 1.2.0
+
+Bundles workload 1.7.0, including its opt-in KEDA HTTP scaling controls. The Signal image,
+single-replica defaults and persistent account-state configuration are unchanged. Keep those
+defaults unless you have verified that a different lifecycle is safe for the account.
 
 ### 1.1.0
 

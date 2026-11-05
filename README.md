@@ -7,7 +7,7 @@ templates, or deploy signal-cli-rest-api with persistent Signal account state.
 
 | Chart | Latest version | OCI reference | Purpose |
 | --- | --- | --- | --- |
-| [signalcli](charts/signalcli/README.md) | `1.1.0` | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
+| [signalcli](charts/signalcli/README.md) | `1.2.0` | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
 | [workload](charts/workload/README.md) | `1.7.0` | `oci://ghcr.io/f2calv/charts/workload` | Deploys common Kubernetes workload kinds with opt-in operational controls and KEDA HTTP scaling. |
 
 Browse the public [workload package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fworkload)
@@ -40,10 +40,10 @@ checking out this repository.
 
 ```mermaid
 graph LR
-  Signal([signalcli chart]) -->|bundled dependency, alias signalcli| Workload[workload chart]
+  Signal(["signalcli 1.2.0"]) -->|bundled dependency, alias signalcli| Workload["workload 1.7.0"]
   Consumer([Your container]) -->|image and values| Workload
   Workload --> Resources[Kubernetes resources]
-  classDef owned fill:#e8f0fe,stroke:#315da8
+  classDef owned fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
   class Signal,Workload owned
 ```
 
