@@ -24,7 +24,7 @@ Ingress needs a matching controller, and persistent claims need a suitable stora
 Install the `workload` chart directly from GHCR:
 
 ```bash
-helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.6.0 \
+helm install my-app oci://ghcr.io/f2calv/charts/workload --version 1.7.0 \
   --namespace my-namespace --create-namespace \
   --set replicaCount=1 \
   --set-string image.repository=nginx \
@@ -59,7 +59,7 @@ spec:
   source:
     repoURL: ghcr.io/f2calv
     chart: charts/workload
-    targetRevision: 1.6.0
+    targetRevision: 1.7.0
     helm:
       valuesObject:
         replicaCount: 1
@@ -126,6 +126,118 @@ Set `kind` to one of the supported primary workload modes (subject to the replic
 
 Set `kind: Job` to render a one-shot Job using the shared image, environment,
 volumes, resources, and scheduling configuration.
+
+### HTTP Autoscaling
+
+Opt into [`keda.http`](https://github.com/f2calv/helm-charts/blob/main/charts/workload/values.yaml)
+to render an
+[`InterceptorRoute`](https://github.com/f2calv/helm-charts/blob/main/charts/workload/templates/interceptorroute.yaml)
+and append its `external-push` trigger to the existing ScaledObject.
+Install KEDA core and the separate
+[HTTP add-on](https://keda.sh/http-add-on/0.16/operations/installation/) first.
+The chart uses the add-on's `http.keda.sh/v1beta1` API, not the deprecated HTTPScaledObject.
+HTTP scaling is available in chart 1.7.0 once that version is published; use the local
+chart source when evaluating an unreleased checkout.
+
+The chart derives the Deployment, backend Service, InterceptorRoute and trigger reference
+from the same full-name helper. Configure explicit routing rules and at least one scaling
+metric. Concurrency and request rate can be used together. Existing `keda.triggers`
+are retained in the same ScaledObject; do not create a second HPA for this Deployment.
+Use `keda.advanced` for KEDA-native settings such as HPA stabilization behavior.
+
+**Replica ownership:** keep `replicaCount` positive so the Deployment and Service exist,
+set `autoscaling.enabled: true` to omit Deployment `spec.replicas`, and use
+`keda.minReplicaCount: 0` for scale-to-zero. Invalid HTTP workload modes, missing
+rules/metrics/scaler addresses and conflicting replica settings fail rendering.
+
+**Ingress ownership:** when HTTP scaling is enabled, both `ingress` and `extraIngresses`
+target `keda.http.interceptor.serviceName` and its `port`. They are rendered in
+`keda.http.interceptor.namespace`, or the workload namespace when that value is empty.
+The Deployment, application Service, ScaledObject and InterceptorRoute remain in the
+workload namespace. Cross-namespace ingress names include a stable namespace/name hash
+to avoid collisions between releases in different application namespaces.
+Computed `valueFrom: serviceName` annotations resolve to the actual interceptor backend.
+Leave ingress `servicePort` empty or set it to the interceptor port.
+
+The interceptor namespace must already exist, and Helm/GitOps permissions must cover it.
+TLS Secrets must exist in the Ingress namespace. With F5 mergeable ingress, an HTTP-scaled
+minion can live beside the interceptor while an independently owned master retains TLS
+in another namespace. Do not copy private keys or move existing ingress ownership implicitly.
+This avoids dependence on controller-specific cross-namespace ExternalName support.
+When migrating an existing ingress, account for its changed namespace/name and avoid
+concurrent host/path owners.
+
+Route every caller that must wake the backend through the interceptor, including internal
+callers using the matching Host/path. Direct application Service traffic bypasses scaling.
+Keep probes directed at application pods, and align caller/ingress timeout budgets with
+the route's readiness and request deadlines. Timeout fields omitted from `keda.http.timeouts`
+inherit add-on defaults; `0s` disables a timeout. `coldStart.maxPendingRequests` bounds
+queued cold-start requests per route per interceptor replica. These settings are
+runtime-neutral: changing from JIT to Native AOT does not change the scaling contract.
+
+## Configuration Examples
+
+### Minimal HTTP Scaling
+
+Apply this fragment alongside the image and Service settings of an existing stateless HTTP app.
+It assumes the add-on's standard Service names in a pre-existing `keda` namespace.
+Ingress remains disabled; arrange caller routing through the interceptor separately.
+
+```yaml
+kind: ScaledObject
+replicaCount: 1
+autoscaling:
+  enabled: true
+keda:
+  minReplicaCount: 0
+  maxReplicaCount: 5
+  http:
+    enabled: true
+    scalerAddress: keda-add-ons-http-external-scaler.keda:9090
+    interceptor:
+      namespace: keda
+    rules:
+      - hosts: [api.example.com]
+    scalingMetric:
+      concurrency:
+        targetValue: 10
+```
+
+### HTTP Scaling with Ingress and Cold-Start Limits
+
+Extend the minimal fragment with these overrides. The ingress is created in `keda`;
+its controller and any TLS configuration are external prerequisites.
+
+```yaml
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+keda:
+  cooldownPeriod: 60
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 60
+  http:
+    timeouts:
+      readiness: 60s
+      request: 90s
+      responseHeader: 30s
+    coldStart:
+      maxPendingRequests: 100
+```
+
+For rate-based scaling, set `keda.http.scalingMetric.requestRate.targetValue` and optionally
+`window: 1m` and `granularity: 1s`; omit `concurrency` to use only request rate.
+Targets and timeout budgets are examples, not measured capacity recommendations.
+
+## Additional Configuration
 
 ### Computed Ingress Annotations
 
@@ -407,12 +519,25 @@ keda:
     backoffLimit: 6
   triggers: []
   triggerAuthentications: []
+  advanced: {}
+  http:
+    enabled: false
+    scalerAddress: ""
+    interceptor:
+      serviceName: keda-add-ons-http-interceptor-proxy
+      namespace: ""
+      port: 8080
+    rules: []
+    scalingMetric: {}
+    timeouts: {}
+    coldStart: {}
 ```
 
 ## Related Projects
 
 - [Kubernetes](https://kubernetes.io/) provides the workload resources rendered by this chart.
 - [KEDA](https://keda.sh/) provides the `ScaledObject` and `ScaledJob` autoscaling resources.
+- [KEDA HTTP add-on](https://keda.sh/http-add-on/0.16/) provides HTTP interception and `InterceptorRoute`.
 
 ## Data Flow
 
@@ -424,6 +549,8 @@ graph LR
   Client([Client]) --> Controller[External ingress controller]
   Controller --> Ingress[Optional Ingress]
   Ingress --> Service[ClusterIP Service]
+  Ingress -->|HTTP scaling enabled| Interceptor[External KEDA HTTP interceptor]
+  Interceptor --> Service
   Service --> Pods[Deployment, DaemonSet or StatefulSet pods]
   Pods -->|optional mount| PVC[(PersistentVolumeClaim)]
   KEDA[External KEDA operator] -. ScaledObject only .-> Pods
@@ -432,7 +559,8 @@ graph LR
 ```
 
 The Service follows `service.type`; ClusterIP is the default. See the behavior limits for
-replica guards. This diagram supplements the text for renderers without Mermaid support.
+replica guards. With HTTP scaling enabled, ingress traffic uses the interceptor path instead
+of the direct Service path. This diagram supplements the text for renderers without Mermaid support.
 
 ## License
 

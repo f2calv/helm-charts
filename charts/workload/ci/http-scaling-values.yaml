@@ -1,0 +1,58 @@
+kind: ScaledObject
+replicaCount: 1
+namespaceOverride: example-app
+fullnameOverride: example-api
+image:
+  repository: nginx
+  tag: 1.27-alpine
+autoscaling:
+  enabled: true
+service:
+  port: 80
+  containerPort: 8080
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+  computedAnnotations:
+    example.com/backend-service:
+      valueFrom: serviceName
+extraIngresses:
+  - enabled: true
+    nameSuffix: alternate
+    hosts:
+      - host: alternate.example.com
+        paths:
+          - path: /api
+            pathType: Prefix
+keda:
+  minReplicaCount: 0
+  maxReplicaCount: 5
+  cooldownPeriod: 60
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 60
+  http:
+    enabled: true
+    scalerAddress: keda-add-ons-http-external-scaler.keda:9090
+    interceptor:
+      namespace: keda
+    rules:
+      - hosts: [api.example.com, alternate.example.com]
+        paths:
+          - value: /api
+    scalingMetric:
+      concurrency:
+        targetValue: 10
+    timeouts:
+      readiness: 60s
+      request: 90s
+      responseHeader: 30s
+    coldStart:
+      maxPendingRequests: 100
