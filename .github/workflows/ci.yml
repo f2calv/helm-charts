@@ -44,9 +44,45 @@ jobs:
       - name: test-piper-chart.sh
         run: bash .scripts/test-piper-chart.sh
 
+  integration:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: f2calv/gha-workflows/.github/actions/devcontainer-tool-versions@v1
+        id: tools
+
+      - uses: azure/setup-helm@v5
+        with:
+          version: ${{ steps.tools.outputs.helm }}
+
+      - uses: helm/kind-action@v1
+
+      - name: helm dependency build charts/signalcli
+        run: helm dependency build charts/signalcli --skip-refresh
+
+      - name: helm dependency build charts/piper
+        run: helm dependency build charts/piper --skip-refresh
+
+      - name: helm dependency build tests/integration
+        run: helm dependency build tests/integration --skip-refresh
+
+      - name: helm install integration
+        run: helm install integration tests/integration --namespace integration --create-namespace --wait --timeout 10m
+
+      - name: helm test integration
+        run: helm test integration --namespace integration --timeout 3m --logs
+
+      - name: kubectl get pods,pvc,events
+        if: failure()
+        run: kubectl get pods,pvc,events --namespace integration
+
   release:
     name: release (${{ matrix.chart }})
-    needs: [lint, workload-tests]
+    needs: [lint, workload-tests, integration]
     strategy:
       fail-fast: false
       matrix:

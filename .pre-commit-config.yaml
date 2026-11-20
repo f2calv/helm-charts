@@ -26,7 +26,7 @@ repos:
   - id: check-xml
   - id: check-yaml
     args: [--allow-multiple-documents]
-    exclude: ^charts/.*/templates/
+    exclude: ^(charts/.*|tests/integration)/templates/
   - id: check-toml
   - id: check-merge-conflict
   - id: check-case-conflict

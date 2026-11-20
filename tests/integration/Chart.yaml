@@ -1,0 +1,15 @@
+apiVersion: v2
+name: integration
+description: CI-only runtime tests for the workload, signalcli and Piper charts.
+type: application
+version: 0.1.0
+dependencies:
+  - name: workload
+    version: 1.7.0
+    repository: file://../../charts/workload
+  - name: signalcli
+    version: 1.2.0
+    repository: file://../../charts/signalcli
+  - name: piper
+    version: 0.1.0
+    repository: file://../../charts/piper

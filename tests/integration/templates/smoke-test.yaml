@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-smoke
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  restartPolicy: Never
+  activeDeadlineSeconds: 180
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: smoke
+      image: python:3-alpine
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: [ALL]
+      resources:
+        requests:
+          cpu: 25m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
+      env:
+        - name: WORKLOAD_HOST
+          value: {{ .Values.workload.fullnameOverride | quote }}
+        - name: SIGNALCLI_HOST
+          value: {{ .Values.signalcli.signalcli.fullnameOverride | quote }}
+        - name: PIPER_HOST
+          value: {{ .Values.piper.piper.fullnameOverride | quote }}
+      command: [python, -B, -c]
+      args:
+        - |
+          import json
+          import os
+          import socket
+          from urllib.request import urlopen
+
+          with urlopen(f"http://{os.environ['WORKLOAD_HOST']}/", timeout=30) as response:
+              if response.status != 200 or b"Welcome to nginx!" not in response.read():
+                  raise RuntimeError("Workload Service did not serve the expected HTTP response")
+          print("PASS: workload HTTP Service", flush=True)
+
+          with urlopen(f"http://{os.environ['SIGNALCLI_HOST']}/v1/about", timeout=30) as response:
+              about = json.load(response)
+              if response.status != 200 or not isinstance(about, dict) or not about:
+                  raise RuntimeError("signalcli Service did not return API information")
+          print("PASS: signalcli API without account registration", flush=True)
+
+          with socket.create_connection((os.environ["PIPER_HOST"], 10200), timeout=60) as connection:
+              request = {"type": "synthesize", "data": {"text": "Integration test."}}
+              connection.sendall(json.dumps(request).encode() + b"\n")
+              with connection.makefile("rb") as stream:
+                  started = False
+                  audio_bytes = 0
+                  nonzero_audio = False
+                  for _ in range(1000):
+                      line = stream.readline()
+                      if not line:
+                          raise RuntimeError("Piper closed the connection before audio-stop")
+                      event = json.loads(line)
+                      data = event.get("data", {})
+                      data_length = event.get("data_length", 0)
+                      if data_length:
+                          encoded_data = stream.read(data_length)
+                          if len(encoded_data) != data_length:
+                              raise RuntimeError("Piper returned truncated event data")
+                          data.update(json.loads(encoded_data))
+                      payload_length = event.get("payload_length", 0)
+                      payload = stream.read(payload_length)
+                      if len(payload) != payload_length:
+                          raise RuntimeError("Piper returned truncated audio")
+                      if event["type"] == "audio-start":
+                          if any(data.get(key, 0) <= 0 for key in ("rate", "width", "channels")):
+                              raise RuntimeError("Piper returned invalid PCM metadata")
+                          started = True
+                      elif event["type"] == "audio-chunk":
+                          if not started:
+                              raise RuntimeError("Piper returned audio before audio-start")
+                          audio_bytes += len(payload)
+                          nonzero_audio = nonzero_audio or any(payload)
+                      elif event["type"] == "audio-stop":
+                          if not started or audio_bytes == 0 or not nonzero_audio:
+                              raise RuntimeError("Piper returned no usable PCM audio")
+                          break
+                      elif event["type"] == "error":
+                          raise RuntimeError("Piper reported a synthesis error")
+                  else:
+                      raise RuntimeError("Piper did not finish within 1000 events")
+          print("PASS: Piper Wyoming synthesis produced nonzero PCM audio", flush=True)
