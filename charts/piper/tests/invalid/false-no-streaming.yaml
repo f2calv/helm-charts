@@ -1,0 +1,3 @@
+piper:
+  envVars:
+    NO_STREAMING: "false"

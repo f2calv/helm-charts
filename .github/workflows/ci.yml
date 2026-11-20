@@ -41,6 +41,9 @@ jobs:
       - name: test-workload-http-scaling.sh
         run: .scripts/test-workload-http-scaling.sh
 
+      - name: test-piper-chart.sh
+        run: bash .scripts/test-piper-chart.sh
+
   release:
     name: release (${{ matrix.chart }})
     needs: [lint, workload-tests]
@@ -50,6 +53,7 @@ jobs:
         chart:
           - workload
           - signalcli
+          - piper
     permissions:
       contents: write
       packages: write

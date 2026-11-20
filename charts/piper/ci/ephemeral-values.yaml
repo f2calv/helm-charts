@@ -1,0 +1,5 @@
+piper:
+  persistentVolumeClaims: []
+  volumes:
+    - name: voices
+      emptyDir: {}

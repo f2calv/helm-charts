@@ -1,0 +1,3 @@
+piper:
+  envVars:
+    PIPER_VOICE: ""
