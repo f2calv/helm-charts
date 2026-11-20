@@ -26,7 +26,7 @@ repos:
   - id: check-xml
   - id: check-yaml
     args: [--allow-multiple-documents]
-    exclude: ^charts/.*/templates/
+    exclude: ^(charts/.*|tests/integration)/templates/
   - id: check-toml
   - id: check-merge-conflict
   - id: check-case-conflict
@@ -82,3 +82,12 @@ repos:
     - --skip-auto-generation=required
     - --skip-auto-generation=additionalProperties
     files: ^charts/signalcli/values\.yaml$
+  - id: helm-schema
+    name: Generate piper jsonschema
+    args:
+    - --chart-search-root=charts/piper
+    - --no-dependencies
+    - --append-newline
+    - --skip-auto-generation=required
+    - --skip-auto-generation=additionalProperties
+    files: ^charts/piper/values\.yaml$

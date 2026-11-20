@@ -1,0 +1,432 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "piper": {
+      "description": "Values under piper are passed to the workload dependency.",
+      "properties": {
+        "envVars": {
+          "additionalProperties": true,
+          "description": "LinuxServer's startup scripts interpret ANY non-empty LOCAL_ONLY or\nNO_STREAMING value as enabled, including the string \"false\".",
+          "properties": {
+            "LOCAL_ONLY": {
+              "enum": [
+                "",
+                true,
+                "true"
+              ],
+              "required": []
+            },
+            "NO_STREAMING": {
+              "enum": [
+                "",
+                true,
+                "true"
+              ],
+              "required": []
+            },
+            "PGID": {
+              "oneOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^[0-9]+$",
+                  "type": "string"
+                }
+              ],
+              "required": []
+            },
+            "PIPER_LENGTH": {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            "PIPER_NOISE": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "PIPER_NOISEW": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "PIPER_SPEAKER": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "PIPER_VOICE": {
+              "minLength": 1,
+              "pattern": "^\\S+$",
+              "type": "string"
+            },
+            "PUID": {
+              "oneOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "pattern": "^[0-9]+$",
+                  "type": "string"
+                }
+              ],
+              "required": []
+            },
+            "TZ": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "envVars"
+        },
+        "image": {
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "lscr.io/linuxserver/piper",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "2.5.4-ls140",
+              "description": "The workload dependency does not inherit the parent's appVersion.",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "image",
+          "type": "object"
+        },
+        "ingress": {
+          "properties": {
+            "enabled": {
+              "const": false,
+              "default": "false",
+              "description": "Wyoming is raw TCP, not HTTP.",
+              "required": [],
+              "title": "enabled"
+            }
+          },
+          "required": [],
+          "title": "ingress",
+          "type": "object"
+        },
+        "kind": {
+          "const": "Deployment",
+          "default": "Deployment",
+          "required": [],
+          "title": "kind"
+        },
+        "livenessProbe": {
+          "default": "false",
+          "oneOf": [
+            {
+              "required": [],
+              "type": "object"
+            },
+            {
+              "const": false,
+              "required": []
+            }
+          ],
+          "required": [],
+          "title": "livenessProbe"
+        },
+        "persistentVolumeClaims": {
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "accessModes": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "accessModes",
+                    "type": "array"
+                  },
+                  "name": {
+                    "default": "piper-data",
+                    "title": "name",
+                    "type": "string"
+                  },
+                  "storage": {
+                    "default": "1Gi",
+                    "title": "storage",
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "persistentVolumeClaims",
+          "type": "array"
+        },
+        "readinessProbe": {
+          "oneOf": [
+            {
+              "required": [],
+              "type": "object"
+            },
+            {
+              "const": false,
+              "required": []
+            }
+          ],
+          "properties": {
+            "failureThreshold": {
+              "default": 3,
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 10,
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "tcpSocket": {
+              "properties": {
+                "port": {
+                  "default": "wyoming",
+                  "title": "port",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "tcpSocket",
+              "type": "object"
+            },
+            "timeoutSeconds": {
+              "default": 2,
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "readinessProbe"
+        },
+        "replicaCount": {
+          "default": "1",
+          "description": "One writer owns the voice cache; stop the old pod before replacing it.",
+          "maximum": 1,
+          "minimum": 0,
+          "required": [],
+          "title": "replicaCount"
+        },
+        "resources": {
+          "properties": {
+            "limits": {
+              "properties": {
+                "memory": {
+                  "default": "1Gi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "limits",
+              "type": "object"
+            },
+            "requests": {
+              "properties": {
+                "cpu": {
+                  "default": "100m",
+                  "title": "cpu",
+                  "type": "string"
+                },
+                "memory": {
+                  "default": "256Mi",
+                  "title": "memory",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "resources",
+          "type": "object"
+        },
+        "service": {
+          "properties": {
+            "containerPort": {
+              "const": 10200,
+              "default": "10200",
+              "required": [],
+              "title": "containerPort"
+            },
+            "enabled": {
+              "default": true,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "name": {
+              "const": "wyoming",
+              "default": "wyoming",
+              "required": [],
+              "title": "name"
+            },
+            "port": {
+              "default": 10200,
+              "title": "port",
+              "type": "integer"
+            },
+            "protocol": {
+              "const": "TCP",
+              "default": "TCP",
+              "required": [],
+              "title": "protocol"
+            },
+            "type": {
+              "default": "ClusterIP",
+              "title": "type",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "service",
+          "type": "object"
+        },
+        "startupProbe": {
+          "description": "Initial voice download can take minutes. TCP checks prove a listener,\nnot successful synthesis; keep liveness disabled during long requests.",
+          "oneOf": [
+            {
+              "required": [],
+              "type": "object"
+            },
+            {
+              "const": false,
+              "required": []
+            }
+          ],
+          "properties": {
+            "failureThreshold": {
+              "default": 60,
+              "title": "failureThreshold",
+              "type": "integer"
+            },
+            "periodSeconds": {
+              "default": 10,
+              "title": "periodSeconds",
+              "type": "integer"
+            },
+            "tcpSocket": {
+              "properties": {
+                "port": {
+                  "default": "wyoming",
+                  "title": "port",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "tcpSocket",
+              "type": "object"
+            },
+            "timeoutSeconds": {
+              "default": 2,
+              "title": "timeoutSeconds",
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "title": "startupProbe"
+        },
+        "strategy": {
+          "properties": {
+            "type": {
+              "const": "Recreate",
+              "default": "Recreate",
+              "required": [],
+              "title": "type"
+            }
+          },
+          "required": [],
+          "title": "strategy",
+          "type": "object"
+        },
+        "volumeMounts": {
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "mountPath": {
+                    "default": "/config",
+                    "title": "mountPath",
+                    "type": "string"
+                  },
+                  "name": {
+                    "default": "voices",
+                    "title": "name",
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "volumeMounts",
+          "type": "array"
+        },
+        "volumes": {
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "name": {
+                    "default": "voices",
+                    "title": "name",
+                    "type": "string"
+                  },
+                  "persistentVolumeClaim": {
+                    "properties": {
+                      "claimName": {
+                        "default": "piper-data",
+                        "title": "claimName",
+                        "type": "string"
+                      }
+                    },
+                    "required": [],
+                    "title": "persistentVolumeClaim",
+                    "type": "object"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "volumes",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "piper",
+      "type": "object"
+    }
+  },
+  "required": [],
+  "type": "object"
+}

@@ -1,0 +1,21 @@
+apiVersion: v2
+name: piper
+description: Deploys LinuxServer Piper with a Wyoming TCP service, voice cache and validated environment settings.
+type: application
+version: 0.1.0
+appVersion: "2.5.4-ls140"
+home: https://docs.linuxserver.io/images/docker-piper/
+annotations:
+  org.opencontainers.image.source: https://github.com/f2calv/helm-charts
+sources:
+  - https://github.com/linuxserver/docker-piper
+  - https://github.com/OHF-Voice/wyoming-piper
+keywords:
+  - piper
+  - wyoming
+  - text-to-speech
+dependencies:
+  - name: workload
+    version: 1.7.0
+    repository: file://../workload
+    alias: piper

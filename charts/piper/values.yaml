@@ -1,0 +1,144 @@
+# Values under piper are passed to the workload dependency.
+piper:
+  # @schema
+  # const: Deployment
+  # @schema
+  kind: Deployment
+  # @schema
+  # minimum: 0
+  # maximum: 1
+  # @schema
+  # One writer owns the voice cache; stop the old pod before replacing it.
+  replicaCount: 1
+  strategy:
+    # @schema
+    # const: Recreate
+    # @schema
+    type: Recreate
+
+  image:
+    repository: lscr.io/linuxserver/piper
+    pullPolicy: IfNotPresent
+    # The workload dependency does not inherit the parent's appVersion.
+    tag: "2.5.4-ls140"
+
+  service:
+    enabled: true
+    # @schema
+    # const: wyoming
+    # @schema
+    name: wyoming
+    type: ClusterIP
+    port: 10200
+    # @schema
+    # const: 10200
+    # @schema
+    containerPort: 10200
+    # @schema
+    # const: TCP
+    # @schema
+    protocol: TCP
+  ingress:
+    # @schema
+    # const: false
+    # @schema
+    # Wyoming is raw TCP, not HTTP.
+    enabled: false
+
+  # LinuxServer's startup scripts interpret ANY non-empty LOCAL_ONLY or
+  # NO_STREAMING value as enabled, including the string "false".
+  # @schema
+  # additionalProperties: true
+  # properties:
+  #   PIPER_VOICE:
+  #     type: string
+  #     minLength: 1
+  #     pattern: '^\S+$'
+  #   PUID:
+  #     oneOf:
+  #       - type: integer
+  #         minimum: 0
+  #       - type: string
+  #         pattern: '^[0-9]+$'
+  #   PGID:
+  #     oneOf:
+  #       - type: integer
+  #         minimum: 0
+  #       - type: string
+  #         pattern: '^[0-9]+$'
+  #   TZ:
+  #     type: string
+  #     minLength: 1
+  #   PIPER_LENGTH:
+  #     type: number
+  #     exclusiveMinimum: 0
+  #   PIPER_NOISE:
+  #     type: number
+  #     minimum: 0
+  #   PIPER_NOISEW:
+  #     type: number
+  #     minimum: 0
+  #   PIPER_SPEAKER:
+  #     type: integer
+  #     minimum: 0
+  #   LOCAL_ONLY:
+  #     enum: ["", true, "true"]
+  #   NO_STREAMING:
+  #     enum: ["", true, "true"]
+  # @schema
+  envVars:
+    PIPER_VOICE: en_US-lessac-medium
+    PUID: "1000"
+    PGID: "1000"
+    TZ: Etc/UTC
+
+  # Initial voice download can take minutes. TCP checks prove a listener,
+  # not successful synthesis; keep liveness disabled during long requests.
+  # @schema
+  # oneOf:
+  #   - type: object
+  #   - const: false
+  # @schema
+  startupProbe:
+    tcpSocket:
+      port: wyoming
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 60
+  # @schema
+  # oneOf:
+  #   - type: object
+  #   - const: false
+  # @schema
+  readinessProbe:
+    tcpSocket:
+      port: wyoming
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+  # @schema
+  # oneOf:
+  #   - type: object
+  #   - const: false
+  # @schema
+  livenessProbe: false
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+  volumes:
+    - name: voices
+      persistentVolumeClaim:
+        claimName: piper-data
+  volumeMounts:
+    - name: voices
+      mountPath: /config
+  persistentVolumeClaims:
+    - name: piper-data
+      accessModes:
+        - ReadWriteOnce
+      storage: 1Gi

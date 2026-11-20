@@ -1,0 +1,5 @@
+# TODO: Remove when actionlint recognizes ubuntu-26.04. Hosted-runner success was verified in
+# https://github.com/f2calv/gha-workflows/actions/runs/43803543377.
+self-hosted-runner:
+  labels:
+    - ubuntu-26.04

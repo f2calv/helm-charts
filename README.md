@@ -1,7 +1,7 @@
 # Helm charts
 
-Public OCI Helm charts for Kubernetes operators: deploy a container with reusable workload
-templates, or deploy signal-cli-rest-api with persistent Signal account state.
+Helm charts for Kubernetes operators: reusable container workloads and application-specific
+wrappers for Signal messaging and Wyoming text-to-speech. Charts are distributed as OCI packages.
 
 ## Chart Catalogue
 
@@ -9,9 +9,11 @@ templates, or deploy signal-cli-rest-api with persistent Signal account state.
 | --- | --- | --- | --- |
 | [signalcli](charts/signalcli/README.md) | `1.2.0` | `oci://ghcr.io/f2calv/charts/signalcli` | Deploys [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) with persistent account state, compatible probes, JVM-sized resources, and validated environment variables. |
 | [workload](charts/workload/README.md) | `1.7.0` | `oci://ghcr.io/f2calv/charts/workload` | Deploys common Kubernetes workload kinds with opt-in operational controls and KEDA HTTP scaling. |
+| [piper](charts/piper/README.md) | `0.1.0` | `oci://ghcr.io/f2calv/charts/piper` | LinuxServer Piper with a Wyoming TCP service, voice cache, TCP probes and validated environment settings. |
 
-Browse the public [workload package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fworkload)
-or [signalcli package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fsignalcli).
+Browse the public [workload package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fworkload),
+[signalcli package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fsignalcli)
+or [piper package](https://github.com/f2calv/helm-charts/pkgs/container/charts%2Fpiper).
 
 ## Quick Start
 
@@ -35,22 +37,24 @@ registration/linking after installation.
 
 ## Dependency Graph
 
-The signalcli package includes its exact workload dependency; installing it does not require
-checking out this repository.
+Application wrappers bundle their exact workload dependency. Installing a published package does
+not require checking out this repository.
 
 ```mermaid
 graph LR
   Signal(["signalcli 1.2.0"]) -->|bundled dependency, alias signalcli| Workload["workload 1.7.0"]
+  Piper(["piper 0.1.0"]) -->|bundled dependency, alias piper| Workload
   Consumer([Your container]) -->|image and values| Workload
   Workload --> Resources[Kubernetes resources]
   classDef owned fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
-  class Signal,Workload owned
+  class Signal,Piper,Workload owned
 ```
 
 ## Version Selection
 
 Each chart has an independent version, defined in
-[signalcli Chart.yaml](charts/signalcli/Chart.yaml) and
+[signalcli Chart.yaml](charts/signalcli/Chart.yaml),
+[piper Chart.yaml](charts/piper/Chart.yaml) and
 [workload Chart.yaml](charts/workload/Chart.yaml). OCI tags use the bare chart version;
 source release tags use `<chart>/<version>`. A chart version is not its container image version.
 The signalcli dependency is pinned in its [Chart.lock](charts/signalcli/Chart.lock).

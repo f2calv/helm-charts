@@ -1,0 +1,3 @@
+# Default LinuxServer image, Wyoming listener and persistent voice cache.
+piper:
+  replicaCount: 1

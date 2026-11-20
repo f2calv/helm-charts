@@ -1,0 +1,16 @@
+piper:
+  persistentVolumeClaims: []
+  volumes:
+    - name: voices
+      persistentVolumeClaim:
+        claimName: existing-voice-cache
+  envVars:
+    PIPER_VOICE: en_US-lessac-medium
+    PUID: 2000
+    PGID: 2000
+    LOCAL_ONLY: true
+    NO_STREAMING: ""
+    PIPER_LENGTH: 1.2
+    PIPER_NOISE: 0.5
+    PIPER_NOISEW: 0.3
+    PIPER_SPEAKER: 0
